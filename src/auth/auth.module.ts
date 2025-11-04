@@ -6,17 +6,21 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { UsuarioModule } from '../usuario/usuario.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
+    CommonModule,
     UsuarioModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: (configService: ConfigService) => {
         const jwtSecret = configService.get<string>('JWT_SECRET');
         if (!jwtSecret) {
-          throw new Error('JWT_SECRET no está definido en las variables de entorno');
+          throw new Error(
+            'JWT_SECRET no está definido en las variables de entorno',
+          );
         }
         return {
           secret: jwtSecret,

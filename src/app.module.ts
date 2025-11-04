@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
-import 'dotenv/config'; 
+import { CommonModule } from './common/common.module';
+import 'dotenv/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,8 +31,7 @@ import 'dotenv/config';
     }),
     UsuarioModule,
     AuthModule,
+    CommonModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

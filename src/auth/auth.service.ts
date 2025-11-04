@@ -1,74 +1,84 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../usuario/usuario.service';
-import * as bcrypt from 'bcrypt';
+import { RegisterPayloadDto } from './dto/register.payload.dto';
+import { CryptService } from '../common/crypt.service';
+import { Usuario } from '../usuario/entities/usuario.entity';
+import { LoginPayloadDto } from './dto/login.payload.dto';
+import { ResultWithData } from '../common/dto/result.dto';
+import { LoginResponseData } from './dto/login.response.data';
+import { JwtUser } from './internalClasses/JWTUser';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usuarioService: UsuarioService,
+    private cryptService: CryptService,
     private jwtService: JwtService,
   ) {}
+  private generateToken(user: Usuario): string {
+    const payload = new JwtUser(user);
 
-  async validateUser(correo: string, password: string): Promise<any> {
+    const access_token = this.jwtService.sign(payload.toPlainObject());
+    return access_token;
+  }
+  async validateUser(
+    correo: string,
+    password: string,
+  ): Promise<Usuario | null> {
     const user = await this.usuarioService.findByCorreo(correo);
-    if (user && await bcrypt.compare(password, user.contraseña)) {
-      const { contraseña, ...result } = user;
-      return result;
+    if (user == null) return null;
+    if (await this.cryptService.compare(password, user.password)) {
+      return user;
     }
     return null;
   }
 
-  async login(correo: string, password: string) {
-    const user = await this.validateUser(correo, password);
+  async login(
+    loginDto: LoginPayloadDto,
+  ): Promise<ResultWithData<LoginResponseData>> {
+    const user = await this.validateUser(loginDto.correo, loginDto.password);
     if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      return new ResultWithData<LoginResponseData>(
+        false,
+        'Credenciales incorrectas',
+        null,
+      );
     }
-    
-    const payload = { 
-      correo: user.correo, 
-      sub: user.id,
-      nombre: user.nombre,
-      apellido: user.apellido
-    };
-    
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        correo: user.correo,
-        nombre: user.nombre,
-        apellido: user.apellido
-      }
-    };
+
+    const access_token = this.generateToken(user);
+
+    return new ResultWithData<LoginResponseData>(
+      true,
+      'Registro exitoso',
+      new LoginResponseData(access_token, new JwtUser(user)),
+    );
   }
 
-  async register(userData: any) {
+  async register(
+    userData: RegisterPayloadDto,
+  ): Promise<ResultWithData<LoginResponseData>> {
     // Verificar si el usuario ya existe
-    const existingUser = await this.usuarioService.findByCorreo(userData.correo);
+    const existingUser = await this.usuarioService.findByCorreo(
+      userData.correo,
+    );
     if (existingUser) {
-      throw new UnauthorizedException('El usuario ya existe');
+      return new ResultWithData<LoginResponseData>(
+        false,
+        'Registro fallido',
+        null,
+      );
     }
 
-    // Crear nuevo usuario (la contraseña se encripta en el servicio)
     const newUser = await this.usuarioService.create(userData);
-    
-    // Generar token
-    const payload = { 
-      correo: newUser.correo, 
-      sub: newUser.id,
-      nombre: newUser.nombre,
-      apellido: newUser.apellido
-    };
 
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: newUser.id,
-        correo: newUser.correo,
-        nombre: newUser.nombre,
-        apellido: newUser.apellido
-      }
-    };
+    const access_token = this.generateToken(newUser);
+
+    return new ResultWithData<LoginResponseData>(
+      true,
+      'Registro exitoso',
+      new LoginResponseData(access_token, new JwtUser(newUser)),
+    );
   }
 }
