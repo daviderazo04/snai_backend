@@ -1,26 +1,51 @@
+import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common';
 import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  Request,
-  Get,
-} from '@nestjs/common';
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LoginPayloadDto } from './dto/login.payload.dto';
 import { RegisterPayloadDto } from './dto/register.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
-import { Usuario } from '../usuario/entities/usuario.entity';
 import * as JWTUser from './internalClasses/JWTUser';
 import { JwtUser } from './internalClasses/JWTUser';
 
+@ApiTags('Auth')
+@ApiExtraModels(ResultWithData, LoginResponseData, JwtUser)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @ApiOperation({ summary: 'Autenticar a un usuario con sus credenciales' })
+  @ApiBody({ type: LoginPayloadDto })
+  @ApiOkResponse({
+    description: 'Autenticación exitosa',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(LoginResponseData) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiUnauthorizedResponse({ description: 'Credenciales inválidas' })
+  @ApiBadRequestResponse({
+    description: 'El payload enviado no cumple las validaciones necesarias',
+  })
   async login(
     @Body() loginDto: LoginPayloadDto,
   ): Promise<ResultWithData<LoginResponseData>> {
@@ -28,6 +53,24 @@ export class AuthController {
   }
 
   @Post('register')
+  @ApiOperation({ summary: 'Registrar un nuevo usuario en la plataforma' })
+  @ApiBody({ type: RegisterPayloadDto })
+  @ApiCreatedResponse({
+    description: 'Usuario registrado y autenticado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(LoginResponseData) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'La información proporcionada no es válida o el correo ya existe',
+  })
   async register(
     @Body() registerDto: RegisterPayloadDto,
   ): Promise<ResultWithData<LoginResponseData>> {
@@ -36,6 +79,24 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @ApiOperation({ summary: 'Obtener la información del usuario autenticado' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Perfil obtenido correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(JwtUser) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'No se proporcionó un token válido o expiró',
+  })
   getProfile(
     @Request() req: JWTUser.AuthenticatedRequest,
   ): ResultWithData<JwtUser> {
