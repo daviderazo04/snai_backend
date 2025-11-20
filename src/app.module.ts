@@ -20,9 +20,11 @@ import 'dotenv/config';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        ssl: {
-          rejectUnauthorized: false, // Para Aiven
-        },
+        ssl:
+          configService.get('DB_SSL') === 'require'
+            ? { rejectUnauthorized: false }
+            : false,
+
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV !== 'production',
         logging: true, // Para debug

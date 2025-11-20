@@ -7,7 +7,7 @@ import { Usuario } from '../usuario/entities/usuario.entity';
 import { LoginPayloadDto } from './dto/login.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
-import { JwtUser } from './internalClasses/JWTUser';
+import { JwtUser } from '../common/jwt/JWTUser';
 import { use } from 'passport';
 
 @Injectable()

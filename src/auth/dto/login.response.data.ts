@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { JwtUser } from '../internalClasses/JWTUser';
+import { JwtUser } from '../../common/jwt/JWTUser';
 
 export class LoginResponseData {
   @ApiProperty({

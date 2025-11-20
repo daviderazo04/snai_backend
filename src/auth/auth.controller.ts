@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Get,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -12,20 +19,22 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { LoginPayloadDto } from './dto/login.payload.dto';
 import { RegisterPayloadDto } from './dto/register.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
-import * as JWTUser from './internalClasses/JWTUser';
-import { JwtUser } from './internalClasses/JWTUser';
+import * as JWTUser from '../common/jwt/JWTUser';
+import { AuthGuard } from '../common/guards/permisos.guard';
+import { Public } from '../common/decorators/public.decorator';
 
 @ApiTags('Auth')
-@ApiExtraModels(ResultWithData, LoginResponseData, JwtUser)
+@ApiExtraModels(ResultWithData, LoginResponseData, JWTUser.JwtUser)
 @Controller('auth')
+@UseGuards(JwtAuthGuard, AuthGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
+  @Public()
   @Post('login')
   @ApiOperation({ summary: 'Autenticar a un usuario con sus credenciales' })
   @ApiBody({ type: LoginPayloadDto })
@@ -51,7 +60,7 @@ export class AuthController {
   ): Promise<ResultWithData<LoginResponseData>> {
     return this.authService.login(loginDto);
   }
-
+  @Public()
   @Post('register')
   @ApiOperation({ summary: 'Registrar un nuevo usuario en la plataforma' })
   @ApiBody({ type: RegisterPayloadDto })
@@ -69,7 +78,8 @@ export class AuthController {
     },
   })
   @ApiBadRequestResponse({
-    description: 'La información proporcionada no es válida o el correo ya existe',
+    description:
+      'La información proporcionada no es válida o el correo ya existe',
   })
   async register(
     @Body() registerDto: RegisterPayloadDto,
@@ -88,7 +98,7 @@ export class AuthController {
         { $ref: getSchemaPath(ResultWithData) },
         {
           properties: {
-            data: { $ref: getSchemaPath(JwtUser) },
+            data: { $ref: getSchemaPath(JWTUser.JwtUser) },
           },
         },
       ],
@@ -99,8 +109,7 @@ export class AuthController {
   })
   getProfile(
     @Request() req: JWTUser.AuthenticatedRequest,
-  ): ResultWithData<JwtUser> {
-    console.log(req.user.roles);
+  ): ResultWithData<JWTUser.JwtUser> {
     return new ResultWithData(true, 'Éxito', req.user);
   }
 }

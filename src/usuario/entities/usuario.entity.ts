@@ -4,9 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
-import { Role } from './usuario.roles.enum';
 import { Estado } from '../../common/internalClasses/estado.enum';
+import { Sesion } from './sesion.entity';
 
 @Entity()
 export class Usuario {
@@ -14,22 +15,14 @@ export class Usuario {
   id: number;
   @Column()
   nombre: string;
-
   @Column()
   apellido: string;
   @Column({ unique: true })
   correo: string;
-
   @Column()
   password: string;
-
-  @Column({
-    type: 'enum',
-    enum: Role,
-    array: true,
-    default: [Role.LECTOR],
-  })
-  roles: Role[];
+  @OneToMany(() => Sesion, (sesion) => sesion.usuario)
+  sesiones: Sesion[];
   @Column({
     type: 'enum',
     enum: Estado,

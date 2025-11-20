@@ -33,10 +33,6 @@ export class UsuarioService {
     }
   }
 
-  async findAll(): Promise<Usuario[]> {
-    return this.userRepository.find();
-  }
-
   async findOne(id: number): Promise<Usuario> {
     const usuario = await this.userRepository.findOne({ where: { id } });
     if (!usuario) {
@@ -45,23 +41,41 @@ export class UsuarioService {
     return usuario;
   }
 
-  async findByCorreo(correo: string): Promise<Usuario | null> {
-    return this.userRepository.findOne({ where: { correo } });
+  async verficarPermiso(userId: number, endpoint: string, metodo: string) {
+    const view_req = metodo == 'GET';
+    const edit_req =
+      metodo == 'POST' ||
+      metodo == 'PATCH' ||
+      metodo == 'PUT' ||
+      metodo == 'DELETE';
+    const data = await this.userRepository
+      .createQueryBuilder('u')
+      .select('e.endpoint', 'endpoint')
+      .addSelect('BOOL_OR(pe."EDIT")', 'EDIT')
+      .addSelect('BOOL_OR(pe."VIEW")', 'VIEW')
+      .innerJoin('sesion', 's', 'u.id = s."usuarioId"')
+      .innerJoin('perfil', 'p', 'p.id = s."perfilId"')
+      .innerJoin('permiso', 'pe', 'pe."perfilId" = p.id')
+      .innerJoin('endpoint', 'e', 'e.id = pe."endpointId"')
+      .where('u.id = :userId', { userId })
+      .andWhere('e.endpoint = :endpoint', { endpoint })
+      .groupBy('e.endpoint')
+      .getRawOne();
+    console.log(data);
+    if (!data) return false;
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (edit_req && data.EDIT) {
+      return true;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (view_req && data.VIEW) {
+      return true;
+    }
+    return false;
   }
 
-  /*  async update(id: number, updateData: any): Promise<Usuario> {
-    // Si se está actualizando la contraseña, encriptarla
-    if (updateData.contraseña) {
-      const newPassword = await this.cryptService.crypt(updateData.password);
-      updateData.contraseña = newPassword;
-    }
-
-    await this.userRepository.update(id, updateData);
-    return this.findOne(id);
-  }*/
-
-  async remove(id: number): Promise<void> {
-    const usuario = await this.findOne(id);
-    await this.userRepository.remove(usuario);
+  async findByCorreo(correo: string): Promise<Usuario | null> {
+    return this.userRepository.findOne({ where: { correo } });
   }
 }
