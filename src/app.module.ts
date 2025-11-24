@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { LocalidadesModule } from './localidades/localidades.module';
 import 'dotenv/config';
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import 'dotenv/config';
     UsuarioModule,
     AuthModule,
     CommonModule,
+    LocalidadesModule,
   ],
 })
 export class AppModule {}
