@@ -1,12 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Usuario } from './entities/usuario.entity';
-import { RegisterPayloadDto } from '../auth/dto/register.payload.dto';
-import { CryptService } from '../common/crypt.service';
-import { PerfilPayloadDto } from './dto/perfil.payload.dto';
-import { Perfil } from './entities/perfil.entity';
-
+import { Usuario } from '../entities/usuario.entity';
+import { RegisterPayloadDto } from '../../auth/dto/register.payload.dto';
+import { CryptService } from '../../common/crypt.service';
+import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 @Injectable()
 export class UsuarioService {
   constructor(
@@ -32,14 +30,6 @@ export class UsuarioService {
     } catch (error) {
       throw new BadRequestException(error);
     }
-  }
-
-  async findOne(id: number): Promise<Usuario> {
-    const usuario = await this.userRepository.findOne({ where: { id } });
-    if (!usuario) {
-      throw new Error(`Usuario con ID ${id} no encontrado`);
-    }
-    return usuario;
   }
 
   async verficarPermiso(userId: number, endpoint: string, metodo: string) {
@@ -79,5 +69,48 @@ export class UsuarioService {
 
   async findByCorreo(correo: string): Promise<Usuario | null> {
     return this.userRepository.findOne({ where: { correo } });
+  }
+  async getSanitizedUsuarios(
+    nombre: string = '',
+    page: number = 1,
+    size: number = 10,
+  ) {
+    const skip = (page - 1) * size;
+    const totalItems = await this.userRepository.count();
+    const totalPages = Math.ceil(totalItems / size);
+    if (nombre == '') {
+      const [perfiles] = await this.userRepository.findAndCount({
+        select: [
+          'id',
+          'apellido',
+          'estado',
+          'nombre',
+          'correo',
+          'estado',
+          'createdAt',
+          'updatedAt',
+        ],
+        take: size,
+        skip: skip,
+      });
+      return new PaginatedResult(perfiles, totalPages, page, size);
+    } else {
+      const [perfiles] = await this.userRepository.findAndCount({
+        select: [
+          'id',
+          'apellido',
+          'estado',
+          'nombre',
+          'correo',
+          'estado',
+          'createdAt',
+          'updatedAt',
+        ],
+        where: { nombre: nombre },
+        take: size,
+        skip: skip,
+      });
+      return new PaginatedResult(perfiles, totalPages, page, size);
+    }
   }
 }

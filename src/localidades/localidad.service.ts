@@ -4,11 +4,15 @@ import { Canton } from './entities/canton.entity';
 import { Provincia } from './entities/provincia.entity';
 import { ProvinciaPayloadDto } from './dto/provincia.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Usuario } from '../usuario/entities/usuario.entity';
 
 @Injectable()
 export class LocalidadService {
   constructor(
+    @InjectRepository(Canton)
     private cantonRepository: Repository<Canton>,
+    @InjectRepository(Provincia)
     private provinciaRepository: Repository<Provincia>,
   ) {}
   async createProvincia(

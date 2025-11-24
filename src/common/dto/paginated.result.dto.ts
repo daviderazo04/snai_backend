@@ -3,24 +3,29 @@ import { ApiProperty } from '@nestjs/swagger';
 export class PaginatedResult<T> {
   @ApiProperty({
     description: 'Los datos en forma de arreglo',
-    example: true,
+    isArray: true,
+    type: Object,
   })
   data: T[];
+
   @ApiProperty({
     description: 'Indica el total de paginas',
-    example: true,
+    example: 5,
   })
   totalPages: number;
+
   @ApiProperty({
     description: 'Indica el numero de pagina actual',
-    example: true,
+    example: 1,
   })
   page: number;
+
   @ApiProperty({
     description: 'Indica el numero de elementos por pagina',
-    example: true,
+    example: 10,
   })
   pageSize: number;
+
   constructor(data: T[], totalPages: number, page: number, pageSize: number) {
     this.data = data;
     this.totalPages = totalPages;

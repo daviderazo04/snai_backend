@@ -6,7 +6,6 @@ import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { LocalidadesModule } from './localidades/localidades.module';
-import { LocalidadController } from './localidad/localidad.controller';
 import 'dotenv/config';
 @Module({
   imports: [
@@ -38,6 +37,6 @@ import 'dotenv/config';
     CommonModule,
     LocalidadesModule,
   ],
-  controllers: [LocalidadController],
+  controllers: [],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
 export enum Estado {
-  ACTIVO,
-  INACTIVO,
+  ACTIVO = 'ACTIVO',
+  INACTIVO = 'INACTIVO',
 }

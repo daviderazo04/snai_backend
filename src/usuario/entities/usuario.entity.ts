@@ -8,16 +8,21 @@ import {
 } from 'typeorm';
 import { Estado } from '../../common/internalClasses/estado.enum';
 import { Sesion } from './sesion.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Usuario {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
+  @ApiProperty()
   @Column()
   nombre: string;
+  @ApiProperty()
   @Column()
   apellido: string;
   @Column({ unique: true })
+  @ApiProperty()
   correo: string;
   @Column()
   password: string;
@@ -29,7 +34,9 @@ export class Usuario {
     array: false,
     default: Estado.ACTIVO,
   })
+  @ApiProperty({ enum: Estado })
   estado: Estado;
+  @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

@@ -6,7 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { UsuarioModule } from '../usuario/usuario.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from '../common/common.module';
-import { AuthGuard } from '../common/guards/permisos.guard';
+import { PermisosGuard } from './guards/permisos.guard';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { AuthGuard } from '../common/guards/permisos.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard],
-  exports: [AuthService, AuthGuard],
+  providers: [AuthService, PermisosGuard],
+  exports: [AuthService, PermisosGuard],
 })
 export class AuthModule {}

@@ -19,19 +19,18 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginPayloadDto } from './dto/login.payload.dto';
 import { RegisterPayloadDto } from './dto/register.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
 import * as JWTUser from '../common/jwt/JWTUser';
-import { AuthGuard } from '../common/guards/permisos.guard';
 import { Public } from '../common/decorators/public.decorator';
+import { PermisosGuard } from './guards/permisos.guard';
 
 @ApiTags('Auth')
 @ApiExtraModels(ResultWithData, LoginResponseData, JWTUser.JwtUser)
 @Controller('auth')
-@UseGuards(JwtAuthGuard, AuthGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Public()
