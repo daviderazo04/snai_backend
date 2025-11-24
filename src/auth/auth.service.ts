@@ -19,7 +19,6 @@ export class AuthService {
   ) {}
   private generateToken(user: Usuario): string {
     const payload = new JwtUser(user);
-
     const access_token = this.jwtService.sign(payload.toPlainObject());
     return access_token;
   }

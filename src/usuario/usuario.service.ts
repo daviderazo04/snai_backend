@@ -2,9 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from './entities/usuario.entity';
-import * as bcrypt from 'bcrypt';
 import { RegisterPayloadDto } from '../auth/dto/register.payload.dto';
 import { CryptService } from '../common/crypt.service';
+import { PerfilPayloadDto } from './dto/perfil.payload.dto';
+import { Perfil } from './entities/perfil.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -48,6 +49,7 @@ export class UsuarioService {
       metodo == 'PATCH' ||
       metodo == 'PUT' ||
       metodo == 'DELETE';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data = await this.userRepository
       .createQueryBuilder('u')
       .select('e.endpoint', 'endpoint')

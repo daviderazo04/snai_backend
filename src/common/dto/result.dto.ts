@@ -26,6 +26,23 @@ export class ResultWithData<T> {
     this.data = data;
   }
 }
+export class SimpleResult {
+  @ApiProperty({
+    description: 'Indica si la operación concluyó exitosamente',
+    example: true,
+  })
+  success: boolean;
+
+  @ApiProperty({
+    description: 'Mensaje adicional asociado al resultado',
+    example: 'Éxito',
+  })
+  message: string;
+  constructor(success: boolean, message: string) {
+    this.success = success;
+    this.message = message;
+  }
+}
 
 export function UnauthResponse<T>(data: T): ResultWithData<T> {
   return new ResultWithData<T>(false, 'No tiene el permiso requerido', data);
