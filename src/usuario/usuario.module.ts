@@ -10,14 +10,15 @@ import { Sesion } from './entities/sesion.entity';
 import { PerfilController } from './controllers/perfil.controller';
 import { RolesService } from './services/roles.service';
 import { UsuarioController } from './controllers/usuario.controller';
+import { PermisosGuard } from '../common/guards/permisos.guard';
 
 @Module({
   imports: [
     CommonModule,
     TypeOrmModule.forFeature([Usuario, Endpoint, Perfil, Permiso, Sesion]),
   ],
-  providers: [UsuarioService, RolesService],
-  exports: [UsuarioService],
+  providers: [UsuarioService, RolesService, PermisosGuard],
+  exports: [UsuarioService, PermisosGuard],
   controllers: [PerfilController, UsuarioController],
 })
 export class UsuarioModule {}

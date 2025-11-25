@@ -20,9 +20,9 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { UsuarioService } from '../services/usuario.service';
 import { PerfilAsignarPayload } from '../dto/perfil.asignar.payload.dto';
 import { RolesService } from '../services/roles.service';
-import { SimpleResult } from 'src/common/dto/result.dto';
-import { PermisosGuard } from '../../auth/guards/permisos.guard';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { SimpleResult } from '../../common/dto/result.dto';
+import { PermisosGuard } from '../../common/guards/permisos.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('usuario')
 export class UsuarioController {
