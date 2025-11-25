@@ -5,6 +5,8 @@ import { Usuario } from '../entities/usuario.entity';
 import { RegisterPayloadDto } from '../../auth/dto/register.payload.dto';
 import { CryptService } from '../../common/crypt.service';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { ILike } from 'typeorm';
+
 @Injectable()
 export class UsuarioService {
   constructor(
@@ -76,10 +78,8 @@ export class UsuarioService {
     size: number = 10,
   ) {
     const skip = (page - 1) * size;
-    const totalItems = await this.userRepository.count();
-    const totalPages = Math.ceil(totalItems / size);
     if (nombre == '') {
-      const [perfiles] = await this.userRepository.findAndCount({
+      const [perfiles, totales] = await this.userRepository.findAndCount({
         select: [
           'id',
           'apellido',
@@ -93,9 +93,10 @@ export class UsuarioService {
         take: size,
         skip: skip,
       });
+      const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(perfiles, totalPages, page, size);
     } else {
-      const [perfiles] = await this.userRepository.findAndCount({
+      const [perfiles, totales] = await this.userRepository.findAndCount({
         select: [
           'id',
           'apellido',
@@ -106,10 +107,12 @@ export class UsuarioService {
           'createdAt',
           'updatedAt',
         ],
-        where: { nombre: nombre },
+        where: { nombre: ILike(`%${nombre}%`) },
         take: size,
         skip: skip,
       });
+      const totalPages = Math.ceil(totales / size);
+
       return new PaginatedResult(perfiles, totalPages, page, size);
     }
   }

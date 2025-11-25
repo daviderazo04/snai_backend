@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 import { Perfil } from '../entities/perfil.entity';
 import { PerfilPayloadDto } from '../dto/perfil.payload.dto';
 import { Permiso } from '../entities/permisos.entity';
@@ -159,20 +159,22 @@ export class RolesService {
     size: number = 10,
   ): Promise<PaginatedResult<Perfil>> {
     const skip = (page - 1) * size;
-    const totalItems = await this.perfilesRepository.count();
-    const totalPages = Math.ceil(totalItems / size);
     if (nombre == '') {
-      const [perfiles] = await this.perfilesRepository.findAndCount({
+      const [perfiles, totales] = await this.perfilesRepository.findAndCount({
         take: size,
         skip: skip,
       });
+      const totalPages = Math.ceil(totales / size);
+
       return new PaginatedResult(perfiles, totalPages, page, size);
     } else {
-      const [perfiles] = await this.perfilesRepository.findAndCount({
-        where: { nombre: nombre },
+      const [perfiles, totales] = await this.perfilesRepository.findAndCount({
+        where: { nombre: ILike(`%${nombre}%`) },
         take: size,
         skip: skip,
       });
+      const totalPages = Math.ceil(totales / size);
+
       return new PaginatedResult(perfiles, totalPages, page, size);
     }
   }
