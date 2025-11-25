@@ -5,9 +5,14 @@ import { Provincia } from './entities/provincia.entity';
 import { Canton } from './entities/canton.entity';
 import { LocalidadService } from './localidad.service';
 import { LocalidadesController } from './localidades.controller';
+import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
-  imports: [CommonModule, TypeOrmModule.forFeature([Provincia, Canton])],
+  imports: [
+    CommonModule,
+    UsuarioModule,
+    TypeOrmModule.forFeature([Provincia, Canton]),
+  ],
   providers: [LocalidadService],
   controllers: [LocalidadesController],
 })

@@ -86,7 +86,7 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermisosGuard)
   @Get('profile')
   @ApiOperation({ summary: 'Obtener la información del usuario autenticado' })
   @ApiBearerAuth()

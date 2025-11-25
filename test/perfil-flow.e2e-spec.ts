@@ -63,12 +63,49 @@ describe('Flujo de perfil (e2e)', () => {
       .expect(201);
 
     const token = registerRes.body?.data?.accessToken as string;
+    const usuarioCreado = await usuarioRepo.findOneByOrFail({
+      correo: 'perfil.e2e@example.com',
+    });
 
-    // Inserta aquí los endpoints que necesites para las pruebas; puedes añadir o quitar
-    const endpointsCreados = await endpointRepo.save([
-      endpointRepo.create({ endpoint: '/usuario' }),
-      endpointRepo.create({ endpoint: '/perfil' }),
-    ]);
+    // Endpoints expuestos por la API; se registran para asignarlos al perfil de prueba
+    const endpointsARegistrar = [
+      '/auth/login',
+      '/auth/register',
+      '/auth/profile',
+      '/usuario',
+      '/usuario/perfil',
+      '/perfil',
+      '/perfil/:id',
+      '/localidades',
+      '/localidades/provincia',
+      '/localidades/canton',
+    ];
+    const endpointsCreados = await endpointRepo.save(
+      endpointsARegistrar.map((endpoint) =>
+        endpointRepo.create({ endpoint }),
+      ),
+    );
+
+    // Perfil y sesión temporales para que el usuario pueda invocar endpoints protegidos
+    const perfilBootstrap = await perfilRepo.save(
+      perfilRepo.create({
+        nombre: 'Bootstrap',
+        descripcion: 'Acceso temporal para pruebas',
+      }),
+    );
+    await permisoRepo.save(
+      endpointsCreados.map((endpoint) =>
+        permisoRepo.create({
+          endpoint,
+          perfil: perfilBootstrap,
+          VIEW: true,
+          EDIT: true,
+        }),
+      ),
+    );
+    await sesionRepo.save(
+      sesionRepo.create({ usuario: usuarioCreado, perfil: perfilBootstrap }),
+    );
 
     const perfilRes = await request(app.getHttpServer())
       .post('/perfil')
@@ -88,14 +125,12 @@ describe('Flujo de perfil (e2e)', () => {
     expect(perfilRes.body.data?.id).toBeDefined();
 
     const perfilCreado: Perfil = perfilRes.body.data;
-    const usuarioCreado = await usuarioRepo.findOneByOrFail({
-      correo: 'perfil.e2e@example.com',
-    });
     await sesionRepo.save(
       sesionRepo.create({ usuario: usuarioCreado, perfil: perfilCreado }),
     );
 
     const permisosEnDb = await permisoRepo.find({
+      where: { perfil: { id: perfilCreado.id } },
       relations: ['endpoint', 'perfil'],
     });
     expect(permisosEnDb).toHaveLength(endpointsCreados.length);

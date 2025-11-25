@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { PerfilPayloadDto } from '../dto/perfil.payload.dto';
 import { RolesService } from '../services/roles.service';
 import {
@@ -17,7 +25,10 @@ import { Perfil } from '../entities/perfil.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { UsuarioService } from '../services/usuario.service';
 import { Usuario } from '../entities/usuario.entity';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PermisosGuard } from '../../common/guards/permisos.guard';
 
+@UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('perfil')
 export class PerfilController {
   constructor(

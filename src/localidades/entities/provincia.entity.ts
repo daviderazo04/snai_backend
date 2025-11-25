@@ -1,11 +1,28 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 import { Canton } from './canton.entity';
 @Entity()
 export class Provincia {
+  @ApiProperty({ description: 'Identificador único de la provincia' })
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ApiProperty({ description: 'Nombre de la provincia', example: 'Pichincha' })
   @Column()
   nombre: string;
-  @ManyToOne(() => Canton, (canton) => canton.provincia)
+
+  @ApiProperty({
+    description: 'Cantones pertenecientes a la provincia',
+    type: () => [Canton],
+    isArray: true,
+    required: false,
+  })
+  @OneToMany(() => Canton, (canton) => canton.provincia)
   cantones: Canton[];
 }
