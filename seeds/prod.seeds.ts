@@ -28,9 +28,8 @@ const ENDPOINTS = [
   '/usuario/perfil',
   '/perfil',
   '/perfil/:id',
-  '/localidades',
-  '/localidades/provincia',
-  '/localidades/canton',
+  '/provincias',
+  '/cantones',
 ];
 
 async function ensureEndpoints(deps: SeedDeps) {

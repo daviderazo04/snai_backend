@@ -84,9 +84,8 @@ describe('Flujo de perfil (e2e)', () => {
       '/usuario/perfil',
       '/perfil',
       '/perfil/:id',
-      '/localidades',
-      '/localidades/provincia',
-      '/localidades/canton',
+      '/provincias',
+      '/cantones',
     ];
     const endpointsCreados = await endpointRepo.save(
       endpointsARegistrar.map((endpoint) =>

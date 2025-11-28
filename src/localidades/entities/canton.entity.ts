@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Provincia } from './provincia.entity';
+import { Cai } from './cai.entity';
 
 @Entity()
 export class Canton {
@@ -18,4 +25,6 @@ export class Canton {
   })
   @ManyToOne(() => Provincia, (provincia) => provincia.cantones)
   provincia: Provincia;
+  @OneToMany(() => Cai, (cai) => cai.canton)
+  cais: Cai[];
 }

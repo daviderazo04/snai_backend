@@ -56,7 +56,31 @@ export class LocalidadService {
       );
     }
   }
-
+  async getPaginatedCanton(
+    nombre: string = '',
+    page: number = 1,
+    size: number = 10,
+  ): Promise<PaginatedResult<Canton>> {
+    const skip = (page - 1) * size;
+    if (nombre == '') {
+      const [perfiles, totales] = await this.cantonRepository.findAndCount({
+        take: size,
+        skip: skip,
+        relations: ['provincia'],
+      });
+      const totalPages = Math.ceil(totales / size);
+      return new PaginatedResult(perfiles, totalPages, page, size);
+    } else {
+      const [perfiles, totales] = await this.cantonRepository.findAndCount({
+        where: { nombre: ILike(`%${nombre}%`) },
+        take: size,
+        skip: skip,
+        relations: ['provincia'],
+      });
+      const totalPages = Math.ceil(totales / size);
+      return new PaginatedResult(perfiles, totalPages, page, size);
+    }
+  }
   async getPaginatedProvincia(
     nombre: string = '',
     page: number = 1,

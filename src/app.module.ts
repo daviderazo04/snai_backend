@@ -11,6 +11,7 @@ import 'dotenv/config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.ENV_FILE || '.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
