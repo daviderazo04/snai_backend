@@ -1,13 +1,12 @@
-FROM node:20
+FROM node:18
+
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 
-# Build la app en la imagen para que dist exista en runtime
-RUN npm run build
+EXPOSE 3000
 
-EXPOSE 8080
-CMD ["node", "dist/src/main.js"]
+CMD ["npm", "run", "start"]
