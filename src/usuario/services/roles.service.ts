@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PerfilAsignarPayload } from '../dto/perfil.asignar.payload.dto';
 import { Usuario } from '../entities/usuario.entity';
 import { Sesion } from '../entities/sesion.entity';
+import { PerfilDto } from '../../auth/dto/perfil.dto';
 
 @Injectable()
 export class RolesService {

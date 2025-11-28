@@ -6,6 +6,8 @@ import { RegisterPayloadDto } from '../../auth/dto/register.payload.dto';
 import { CryptService } from '../../common/crypt.service';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { ILike } from 'typeorm';
+import { PerfilDto } from '../../auth/dto/perfil.dto';
+import { Perfil } from '../entities/perfil.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -34,7 +36,12 @@ export class UsuarioService {
     }
   }
 
-  async verficarPermiso(userId: number, endpoint: string, metodo: string) {
+  async verficarPermiso(
+    userId: number,
+    endpoint: string,
+    metodo: string,
+    perfilId: number,
+  ) {
     const view_req = metodo == 'GET';
     const edit_req =
       metodo == 'POST' ||
@@ -53,6 +60,7 @@ export class UsuarioService {
       .innerJoin('endpoint', 'e', 'e.id = pe."endpointId"')
       .where('u.id = :userId', { userId })
       .andWhere('e.endpoint = :endpoint', { endpoint })
+      .andWhere('p."id" = :perfilId', { perfilId })
       .groupBy('e.endpoint')
       .getRawOne();
     console.log(data);
@@ -115,5 +123,24 @@ export class UsuarioService {
 
       return new PaginatedResult(perfiles, totalPages, page, size);
     }
+  }
+  async getUsuarioById(id: number): Promise<Usuario | null> {
+    return this.userRepository.findOne({ where: { id } });
+  }
+  async getPerfiles(userId: number): Promise<PerfilDto[]> {
+    const usuario = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['sesiones', 'sesiones.perfil'],
+    });
+    const perfiles: PerfilDto[] = [];
+    usuario?.sesiones.forEach((sesion) => {
+      const perfil = new PerfilDto(sesion.perfil.id, sesion.perfil.nombre);
+      perfiles.push(perfil);
+    });
+    return perfiles;
+  }
+  async checkPerfil(userId: number, perfilId: number): Promise<boolean> {
+    const perfiles = await this.getPerfiles(userId);
+    return perfiles.some((perfil) => perfil.id == perfilId);
   }
 }

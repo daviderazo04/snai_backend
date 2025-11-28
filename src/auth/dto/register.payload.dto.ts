@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
+import { Sexo } from '../../common/enums/sexo.enums';
 
 export class RegisterPayloadDto {
   @ApiProperty({
@@ -30,4 +37,28 @@ export class RegisterPayloadDto {
   })
   @IsNotEmpty()
   apellido: string;
+
+  @ApiProperty({
+    enum: Sexo,
+    example: Sexo.MASCULINO,
+    description: 'Sexo del usuario según catálogo permitido',
+  })
+  @IsEnum(Sexo)
+  @IsString()
+  sexo: Sexo;
+
+  @ApiProperty({
+    example: 'Av. Siempre Viva 123',
+    description: 'Dirección física de residencia',
+  })
+  @IsNotEmpty()
+  direccion: string;
+
+  @ApiProperty({
+    example: '+593991112233',
+    description: 'Número de teléfono en formato internacional',
+  })
+  @IsNotEmpty()
+  @IsPhoneNumber('EC')
+  telefono: string;
 }

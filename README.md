@@ -31,7 +31,7 @@ Swagger: `/api`
 
 ```bash
 npm run test         # unit
-npm run test:e2e     # e2e (usa la DB del .env)
+npm run test:e2e     # e2e (usa la DB del .env.prd)
 # Ejemplo para correr solo el flujo de perfil:
 npm run test:e2e -- --runTestsByPath test/perfil-flow.e2e-spec.ts
 ```

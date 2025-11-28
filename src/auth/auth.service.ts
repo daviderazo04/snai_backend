@@ -8,7 +8,8 @@ import { LoginPayloadDto } from './dto/login.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
 import { JwtUser } from '../common/jwt/JWTUser';
-import { use } from 'passport';
+import * as JWTUser from '../common/jwt/JWTUser';
+import { PerfilDto } from './dto/perfil.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,8 +18,8 @@ export class AuthService {
     private cryptService: CryptService,
     private jwtService: JwtService,
   ) {}
-  private generateToken(user: Usuario): string {
-    const payload = new JwtUser(user);
+  private generateToken(user: Usuario, perfil?: PerfilDto): string {
+    const payload = new JwtUser(user, perfil);
     const access_token = this.jwtService.sign(payload.toPlainObject());
     return access_token;
   }
@@ -33,7 +34,32 @@ export class AuthService {
     }
     return null;
   }
-
+  async gainAccess(
+    user: JWTUser.JwtUser,
+    payload: PerfilDto,
+  ): Promise<ResultWithData<LoginResponseData>> {
+    const perfilesDisponibles = await this.usuarioService.getPerfiles(user.id);
+    const autorizado = perfilesDisponibles.some(
+      (perfil) => perfil.id === payload.id,
+    );
+    if (!autorizado)
+      return new ResultWithData<LoginResponseData>(
+        false,
+        'No tiene autorizacion para usar este perfil',
+        null,
+      );
+    const authUser = await this.usuarioService.getUsuarioById(user.id);
+    const access_token = this.generateToken(authUser!, payload);
+    return new ResultWithData<LoginResponseData>(
+      true,
+      'Acceso concedido',
+      new LoginResponseData(
+        access_token,
+        new JwtUser(authUser!, payload),
+        perfilesDisponibles,
+      ),
+    );
+  }
   async login(
     loginDto: LoginPayloadDto,
   ): Promise<ResultWithData<LoginResponseData>> {
@@ -47,11 +73,11 @@ export class AuthService {
     }
 
     const access_token = this.generateToken(user);
-
+    const permisos = await this.usuarioService.getPerfiles(user.id);
     return new ResultWithData<LoginResponseData>(
       true,
-      'Registro exitoso',
-      new LoginResponseData(access_token, new JwtUser(user)),
+      'Login exitoso',
+      new LoginResponseData(access_token, new JwtUser(user), permisos),
     );
   }
 
@@ -77,7 +103,7 @@ export class AuthService {
     return new ResultWithData<LoginResponseData>(
       true,
       'Registro exitoso',
-      new LoginResponseData(access_token, new JwtUser(newUser)),
+      new LoginResponseData(access_token, new JwtUser(newUser), []),
     );
   }
 }
