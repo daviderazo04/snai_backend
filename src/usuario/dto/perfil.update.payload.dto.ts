@@ -21,5 +21,5 @@ export class PerfilUpdatePayloadDto {
     example: [{ endpoint: '/endpoint', VIEW: true, EDIT: true }],
     description: 'Lista de permisos del perfil',
   })
-  permisosEditados: PermisoDto[];
+  nuevosPermisos: PermisoDto[];
 }
