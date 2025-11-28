@@ -1,12 +1,14 @@
-FROM node:18
+FROM node:20
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+
+@@ -7,6 +7,8 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD ["npm", "run", "start"]
+EXPOSE 8080
+
+CMD ["npm", "run", "start:prod"]
