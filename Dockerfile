@@ -18,7 +18,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/seeds ./seeds
+COPY --from=builder /app/dist/seeds ./seeds
 
 EXPOSE 8080
 # Ejecuta seeds antes de iniciar
