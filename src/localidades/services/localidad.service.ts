@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ILike, Repository } from 'typeorm';
-import { Canton } from './entities/canton.entity';
-import { Provincia } from './entities/provincia.entity';
-import { ProvinciaPayloadDto } from './dto/provincia.payload.dto';
-import { ResultWithData } from '../common/dto/result.dto';
+import { Canton } from '../entities/canton.entity';
+import { Provincia } from '../entities/provincia.entity';
+import { ProvinciaPayloadDto } from '../dto/provincia.payload.dto';
+import { ResultWithData } from '../../common/dto/result.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CantonPayload } from './dto/canton.payload.dto';
-import { PaginatedResult } from '../common/dto/paginated.result.dto';
+import { CantonPayload } from '../dto/canton.payload.dto';
+import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 
 @Injectable()
 export class LocalidadService {

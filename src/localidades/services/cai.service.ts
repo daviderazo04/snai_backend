@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Canton } from './entities/canton.entity';
+import { Canton } from '../entities/canton.entity';
 import { ILike, Repository } from 'typeorm';
-import { Provincia } from './entities/provincia.entity';
-import { Cai } from './entities/cai.entity';
-import { CaiPayloadDto } from './dto/cai.payload.dto';
-import { ResultWithData } from '../common/dto/result.dto';
-import { PaginatedResult } from '../common/dto/paginated.result.dto';
+import { Provincia } from '../entities/provincia.entity';
+import { Cai } from '../entities/cai.entity';
+import { CaiPayloadDto } from '../dto/cai.payload.dto';
+import { ResultWithData } from '../../common/dto/result.dto';
+import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 
 @Injectable()
 export class CaiService {

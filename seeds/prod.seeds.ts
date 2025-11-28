@@ -30,6 +30,12 @@ const ENDPOINTS = [
   '/perfil/:id',
   '/provincias',
   '/cantones',
+  '/cai',
+  '/estado-civil',
+  '/etnia',
+  '/gdos',
+  '/nacionalidad',
+  '/parentesco',
 ];
 
 async function ensureEndpoints(deps: SeedDeps) {

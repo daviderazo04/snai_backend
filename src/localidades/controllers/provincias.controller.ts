@@ -10,13 +10,13 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ProvinciaPayloadDto } from './dto/provincia.payload.dto';
-import { LocalidadService } from './localidad.service';
-import { ResultWithData } from '../common/dto/result.dto';
-import { Provincia } from './entities/provincia.entity';
-import { PaginatedResult } from '../common/dto/paginated.result.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { PermisosGuard } from '../common/guards/permisos.guard';
+import { ProvinciaPayloadDto } from '../dto/provincia.payload.dto';
+import { LocalidadService } from '../services/localidad.service';
+import { ResultWithData } from '../../common/dto/result.dto';
+import { Provincia } from '../entities/provincia.entity';
+import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PermisosGuard } from '../../common/guards/permisos.guard';
 
 @ApiTags('Provincias')
 @ApiExtraModels(ResultWithData, PaginatedResult, Provincia)

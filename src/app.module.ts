@@ -6,6 +6,7 @@ import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { LocalidadesModule } from './localidades/localidades.module';
+import { ParametrosModule } from './parametros/parametros.module';
 import 'dotenv/config';
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import 'dotenv/config';
     AuthModule,
     CommonModule,
     LocalidadesModule,
+    ParametrosModule,
   ],
   controllers: [],
 })

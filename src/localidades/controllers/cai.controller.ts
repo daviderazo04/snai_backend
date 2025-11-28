@@ -10,15 +10,15 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { CaiService } from './cai.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { PermisosGuard } from '../common/guards/permisos.guard';
-import { CaiPayloadDto } from './dto/cai.payload.dto';
-import { ResultWithData } from '../common/dto/result.dto';
-import { Cai } from './entities/cai.entity';
-import { PaginatedResult } from '../common/dto/paginated.result.dto';
-import { Canton } from './entities/canton.entity';
-import { Provincia } from './entities/provincia.entity';
+import { CaiService } from '../services/cai.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PermisosGuard } from '../../common/guards/permisos.guard';
+import { CaiPayloadDto } from '../dto/cai.payload.dto';
+import { ResultWithData } from '../../common/dto/result.dto';
+import { Cai } from '../entities/cai.entity';
+import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Canton } from '../entities/canton.entity';
+import { Provincia } from '../entities/provincia.entity';
 
 @ApiTags('CAI')
 @ApiExtraModels(ResultWithData, PaginatedResult, Cai, Canton, Provincia)

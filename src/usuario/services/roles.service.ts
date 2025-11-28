@@ -37,20 +37,7 @@ export class RolesService {
           actualPerfil.descripcion = payload.descripcion;
         }
         await manager.save(actualPerfil);
-        for (const permiso of payload.permisosEliminados) {
-          const actualEndpoint = await manager.findOneBy(Endpoint, {
-            endpoint: permiso.endpoint,
-          });
-          if (!actualEndpoint) {
-            throw new Error(`Endpoint ${permiso.endpoint} no encontrado`);
-          }
-          const actualPermiso = await manager.findOneBy(Permiso, {
-            endpoint: actualEndpoint,
-            perfil: actualPerfil,
-          });
-          await manager.remove(actualPermiso!);
-        }
-        for (const permiso of payload.nuevosPermisos) {
+        for (const permiso of payload.permisosEditados) {
           const actualEndpoint = await manager.findOneBy(Endpoint, {
             endpoint: permiso.endpoint,
           });
@@ -91,6 +78,7 @@ export class RolesService {
           descripcion: payload.descripcion,
         });
         await manager.save(Perfil, newPerfil);
+        let endpointsRestantes = await manager.find(Endpoint);
         for (const permiso of payload.permisos) {
           const endpointReal = await manager.findOneBy(Endpoint, {
             endpoint: permiso.endpoint,
@@ -103,6 +91,18 @@ export class RolesService {
             perfil: newPerfil,
             EDIT: permiso.EDIT,
             VIEW: permiso.VIEW,
+          });
+          await manager.save(Permiso, nuevoPermiso);
+          endpointsRestantes = endpointsRestantes.filter(
+            (e) => e.endpoint != permiso.endpoint,
+          );
+        }
+        for (const endpoint of endpointsRestantes) {
+          const nuevoPermiso = manager.create(Permiso, {
+            endpoint: endpoint,
+            perfil: newPerfil,
+            EDIT: false,
+            VIEW: false,
           });
           await manager.save(Permiso, nuevoPermiso);
         }

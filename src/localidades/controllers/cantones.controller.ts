@@ -10,13 +10,13 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { CantonPayload } from './dto/canton.payload.dto';
-import { ResultWithData } from '../common/dto/result.dto';
-import { Canton } from './entities/canton.entity';
-import { PaginatedResult } from '../common/dto/paginated.result.dto';
-import { LocalidadService } from './localidad.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { PermisosGuard } from '../common/guards/permisos.guard';
+import { CantonPayload } from '../dto/canton.payload.dto';
+import { ResultWithData } from '../../common/dto/result.dto';
+import { Canton } from '../entities/canton.entity';
+import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { LocalidadService } from '../services/localidad.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PermisosGuard } from '../../common/guards/permisos.guard';
 
 @ApiTags('Cantones')
 @ApiExtraModels(ResultWithData, PaginatedResult, Canton)
