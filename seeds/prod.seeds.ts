@@ -7,15 +7,16 @@ import { Perfil } from '../src/usuario/entities/perfil.entity';
 import { Permiso } from '../src/usuario/entities/permisos.entity';
 import { Usuario } from '../src/usuario/entities/usuario.entity';
 import { Sesion } from '../src/usuario/entities/sesion.entity';
-import { UsuarioService } from '../src/usuario/services/usuario.service';
 import { Sexo } from '../src/common/enums/sexo.enums';
+import { CryptService } from '../src/common/crypt.service';
 
 type SeedDeps = {
   endpointRepo: Repository<Endpoint>;
   perfilRepo: Repository<Perfil>;
   permisoRepo: Repository<Permiso>;
+  dataSource: DataSource;
+  cryptService: CryptService;
   sesionRepo: Repository<Sesion>;
-  usuarioService: UsuarioService;
 };
 
 const ENDPOINTS = [
@@ -99,38 +100,65 @@ async function ensureAdminUsuario(
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!';
   const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Admin';
   const apellido = process.env.SEED_ADMIN_APELLIDO ?? 'SNIA';
+  const columnsRows = await deps.dataSource.query(
+    `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'usuario'`,
+  );
+  const columns = new Set<string>(
+    columnsRows.map((row: { column_name: string }) => row.column_name),
+  );
 
-  let usuario = await deps.usuarioService.findByCorreo(correo);
-  if (!usuario) {
-    usuario = await deps.usuarioService.create({
-      correo,
-      password,
-      nombre,
-      apellido,
-      sexo: Sexo.MASCULINO,
-      direccion: 'Direccion administrador',
-      telefono: '+593000000000',
-    });
+  const [found] = await deps.dataSource.query(
+    `SELECT id FROM "usuario" WHERE correo = $1 LIMIT 1`,
+    [correo],
+  );
+
+  let usuarioId: number;
+  if (!found) {
+    const hashed = await deps.cryptService.crypt(password);
+    const colNames = ['correo', 'password', 'nombre', 'apellido'];
+    const values: unknown[] = [correo, hashed, nombre, apellido];
+
+    if (columns.has('sexo')) {
+      colNames.push('sexo');
+      values.push(Sexo.MASCULINO);
+    }
+    if (columns.has('direccion')) {
+      colNames.push('direccion');
+      values.push('Direccion administrador');
+    }
+    if (columns.has('telefono')) {
+      colNames.push('telefono');
+      values.push('+593000000000');
+    }
+
+    const placeholders = colNames.map((_, idx) => `$${idx + 1}`).join(',');
+    const insertSql = `INSERT INTO "usuario"(${colNames
+      .map((c) => `"${c}"`)
+      .join(',')}) VALUES (${placeholders}) RETURNING id`;
+    const [inserted] = await deps.dataSource.query(insertSql, values);
+    usuarioId = inserted.id as number;
     // eslint-disable-next-line no-console
     console.log(`Usuario administrador creado: ${correo}`);
   } else {
+    usuarioId = found.id as number;
     // eslint-disable-next-line no-console
     console.log(`Usuario administrador ya existe: ${correo}`);
   }
 
-  const sesionExistente = await deps.sesionRepo.findOne({
-    where: { usuario: { id: usuario.id }, perfil: { id: perfil.id } },
-    relations: ['usuario', 'perfil'],
-  });
-  if (!sesionExistente) {
-    await deps.sesionRepo.save(
-      deps.sesionRepo.create({ usuario, perfil: perfil }),
+  const [sesion] = await deps.dataSource.query(
+    `SELECT id FROM "sesion" WHERE "usuarioId" = $1 AND "perfilId" = $2 LIMIT 1`,
+    [usuarioId, perfil.id],
+  );
+  if (!sesion) {
+    await deps.dataSource.query(
+      `INSERT INTO "sesion"("usuarioId","perfilId") VALUES ($1,$2)`,
+      [usuarioId, perfil.id],
     );
     // eslint-disable-next-line no-console
     console.log('Perfil Administrador asignado al usuario administrador');
   }
 
-  return usuario;
+  return deps.dataSource.getRepository(Usuario).create({ id: usuarioId });
 }
 
 async function bootstrap() {
@@ -144,7 +172,8 @@ async function bootstrap() {
       perfilRepo: dataSource.getRepository(Perfil),
       permisoRepo: dataSource.getRepository(Permiso),
       sesionRepo: dataSource.getRepository(Sesion),
-      usuarioService: app.get(UsuarioService),
+      dataSource,
+      cryptService: app.get(CryptService),
     };
 
     const endpoints = await ensureEndpoints(deps);
