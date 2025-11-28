@@ -96,6 +96,8 @@ async function ensureAdminUsuario(
   deps: SeedDeps,
   perfil: Perfil,
 ): Promise<Usuario> {
+  // eslint-disable-next-line no-console
+  console.log('== Creando usuario administrador (idempotente) ==');
   const correo = process.env.SEED_ADMIN_EMAIL ?? 'admin@snai.local';
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!';
   const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Admin';
@@ -105,6 +107,10 @@ async function ensureAdminUsuario(
   );
   const columns = new Set<string>(
     columnsRows.map((row: { column_name: string }) => row.column_name),
+  );
+  // eslint-disable-next-line no-console
+  console.log(
+    `Columnas detectadas en usuario: ${Array.from(columns).join(', ')}`,
   );
 
   const [found] = await deps.dataSource.query(
@@ -138,11 +144,11 @@ async function ensureAdminUsuario(
     const [inserted] = await deps.dataSource.query(insertSql, values);
     usuarioId = inserted.id as number;
     // eslint-disable-next-line no-console
-    console.log(`Usuario administrador creado: ${correo}`);
+    console.log(`Usuario administrador creado: ${correo} (id=${usuarioId})`);
   } else {
     usuarioId = found.id as number;
     // eslint-disable-next-line no-console
-    console.log(`Usuario administrador ya existe: ${correo}`);
+    console.log(`Usuario administrador ya existe: ${correo} (id=${usuarioId})`);
   }
 
   const [sesion] = await deps.dataSource.query(
@@ -156,6 +162,9 @@ async function ensureAdminUsuario(
     );
     // eslint-disable-next-line no-console
     console.log('Perfil Administrador asignado al usuario administrador');
+  } else {
+    // eslint-disable-next-line no-console
+    console.log('El usuario administrador ya tenía el perfil asignado');
   }
 
   return deps.dataSource.getRepository(Usuario).create({ id: usuarioId });
@@ -178,7 +187,9 @@ async function bootstrap() {
 
     const endpoints = await ensureEndpoints(deps);
     const adminPerfil = await ensureAdminPerfil(deps, endpoints);
-    await ensureAdminUsuario(deps, adminPerfil);
+    const adminUser = await ensureAdminUsuario(deps, adminPerfil);
+    // eslint-disable-next-line no-console
+    console.log(`Usuario admin listo con id=${adminUser.id}`);
 
     // eslint-disable-next-line no-console
     console.log('Seed de producción completado');
