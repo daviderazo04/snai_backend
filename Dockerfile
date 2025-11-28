@@ -2,13 +2,16 @@ FROM node:20
 
 WORKDIR /app
 
-
-@@ -7,6 +7,8 @@ RUN npm install
-
+# Copiar todo
 COPY . .
 
+# Instalar dependencias
+RUN npm install
+
+# Compilar NestJS
 RUN npm run build
 
 EXPOSE 8080
 
+# Ejecutar
 CMD ["npm", "run", "start:prod"]
