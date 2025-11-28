@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Estado } from '../../common/enums/estado.enum';
+import { Adolescente } from 'src/adolescente/entities/adolescente.entity';
 
 @Entity()
 export class Etnia {
@@ -14,4 +15,6 @@ export class Etnia {
     default: Estado.ACTIVO,
   })
   estado: Estado;
+  @OneToMany(() => Adolescente, (adolescente) => adolescente.etnia)
+  adolescentes: Adolescente[];
 }

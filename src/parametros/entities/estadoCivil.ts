@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Estado } from '../../common/enums/estado.enum';
-import { ApiProperty } from '@nestjs/swagger';
+import { Adolescente } from 'src/adolescente/entities/adolescente.entity';
 
 @Entity()
 export class EstadoCivil {
@@ -15,4 +15,6 @@ export class EstadoCivil {
     default: Estado.ACTIVO,
   })
   estado: Estado;
+  @OneToMany(() => Adolescente, (adolescente) => adolescente.estadoCivil)
+  adolescentes: Adolescente[];
 }

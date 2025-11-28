@@ -8,6 +8,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Provincia } from './provincia.entity';
 import { Cai } from './cai.entity';
+import { Adolescente } from 'src/adolescente/entities/adolescente.entity';
 
 @Entity()
 export class Canton {
@@ -27,4 +28,6 @@ export class Canton {
   provincia: Provincia;
   @OneToMany(() => Cai, (cai) => cai.canton)
   cais: Cai[];
+  @OneToMany(() => Adolescente, (adolescente) => adolescente.canton)
+  adolescentes: Adolescente[];
 }

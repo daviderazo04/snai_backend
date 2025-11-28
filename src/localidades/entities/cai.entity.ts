@@ -1,6 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Canton } from './canton.entity';
+import { Adolescente } from 'src/adolescente/entities/adolescente.entity';
+
 @Entity()
 export class Cai {
   @ApiProperty({ description: 'Identificador único del CAI' })
@@ -17,4 +25,7 @@ export class Cai {
   @ApiProperty({ description: 'Nombre del CAI', example: 'CAI Central' })
   @Column()
   nombre: string;
+
+  @OneToMany(() => Adolescente, (adolescente) => adolescente.cai)
+  adolescentes: Adolescente[];
 }
