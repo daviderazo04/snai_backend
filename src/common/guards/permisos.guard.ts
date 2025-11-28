@@ -30,6 +30,7 @@ export class PermisosGuard implements CanActivate {
       .getRequest<AuthenticatedRequest>();
 
     const user = req.user;
+    
     if (!user) return false;
     if (!user.perfilActivo) return false;
     const rutaEstandar = this.normalizePath(context, req);
