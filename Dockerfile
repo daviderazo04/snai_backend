@@ -6,5 +6,8 @@ RUN npm ci
 
 COPY . .
 
+# Build la app en la imagen para que dist exista en runtime
+RUN npm run build
+
 EXPOSE 8080
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/src/main.js"]
