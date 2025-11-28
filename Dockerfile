@@ -21,4 +21,5 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/seeds ./seeds
 
 EXPOSE 8080
-CMD ["node", "dist/src/main.js"]
+# Ejecuta seeds antes de iniciar
+CMD node dist/seeds/prod.seeds.js && node dist/src/main.js
