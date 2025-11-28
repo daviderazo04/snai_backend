@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+Dockerfile
+dist
+.git
+.gitignore
+.env
+pnpm-lock.yaml
+pnpm-workspace.yaml
+coverage
+tmp
+.turbo
+.vscode
+.idea
