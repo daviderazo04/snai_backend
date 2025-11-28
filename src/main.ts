@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { DataSource } from 'typeorm';
-import { runProdSeed } from './seeds/runProdSeed';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,13 +14,6 @@ async function bootstrap() {
     logger.log('Migraciones aplicadas correctamente');
   } catch (err) {
     logger.error('Error al aplicar migraciones automáticamente', err as Error);
-  }
-
-  try {
-    await runProdSeed(app);
-    logger.log('Seed de admin/endpoints aplicado correctamente');
-  } catch (err) {
-    logger.error('Error al aplicar seed automático', err as Error);
   }
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
