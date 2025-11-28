@@ -6,9 +6,10 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Estado } from '../../common/internalClasses/estado.enum';
+import { Estado } from '../../common/enums/estado.enum';
 import { Sesion } from './sesion.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Sexo } from '../../common/enums/sexo.enums';
 
 @Entity()
 export class Usuario {
@@ -26,6 +27,17 @@ export class Usuario {
   correo: string;
   @Column()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: Sexo,
+    array: false,
+  })
+  sexo: Sexo;
+  @Column()
+  direccion: string;
+  @Column()
+  telefono: string;
   @OneToMany(() => Sesion, (sesion) => sesion.usuario)
   sesiones: Sesion[];
   @Column({

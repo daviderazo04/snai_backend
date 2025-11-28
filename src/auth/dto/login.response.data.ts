@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { JwtUser } from '../../common/jwt/JWTUser';
+import { PerfilDto } from './perfil.dto';
 
 export class LoginResponseData {
   @ApiProperty({
@@ -9,13 +10,30 @@ export class LoginResponseData {
   accessToken: string;
 
   @ApiProperty({
-    description: 'Información del usuario autenticado incluida en el token',
+    description:
+      'Informacion del usuario autenticado incluida en el token; incluye perfilActivo si se selecciono uno',
     type: () => JwtUser,
   })
   user: JwtUser;
 
-  constructor(accessToken: string, user: JwtUser) {
+  @ApiProperty({
+    description: 'Perfiles disponibles para el usuario autenticado',
+    type: () => PerfilDto,
+    isArray: true,
+    example: [
+      { id: 1, nombre: 'Administrador' },
+      { id: 2, nombre: 'Consulta' },
+    ],
+  })
+  posiblesPerfiles: PerfilDto[];
+
+  constructor(
+    accessToken: string,
+    user: JwtUser,
+    posiblesPerfiles: PerfilDto[],
+  ) {
     this.accessToken = accessToken;
     this.user = user;
+    this.posiblesPerfiles = posiblesPerfiles;
   }
 }

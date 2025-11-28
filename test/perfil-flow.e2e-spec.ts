@@ -52,20 +52,28 @@ describe('Flujo de perfil (e2e)', () => {
   it('registra usuario, inserta endpoints y crea perfil con permisos', async () => {
     await clearDatabase();
 
+    const credenciales = {
+      correo: 'perfil.e2e@example.com',
+      password: 'Password123!',
+      nombre: 'Perfil',
+      apellido: 'E2E',
+      sexo: 'MASCULINO',
+      direccion: 'Av. Siempre Viva 123',
+      telefono: '+593991112233',
+    };
+
     const registerRes = await request(app.getHttpServer())
       .post('/auth/register')
-      .send({
-        correo: 'perfil.e2e@example.com',
-        password: 'Password123!',
-        nombre: 'Perfil',
-        apellido: 'E2E',
-      })
+      .send(credenciales)
       .expect(201);
+    expect(registerRes.body.success).toBe(true);
 
-    const token = registerRes.body?.data?.accessToken as string;
     const usuarioCreado = await usuarioRepo.findOneByOrFail({
-      correo: 'perfil.e2e@example.com',
+      correo: credenciales.correo,
     });
+    expect(usuarioCreado.sexo).toBe('MASCULINO');
+    expect(usuarioCreado.direccion).toBe('Av. Siempre Viva 123');
+    expect(usuarioCreado.telefono).toBe('+593991112233');
 
     // Endpoints expuestos por la API; se registran para asignarlos al perfil de prueba
     const endpointsARegistrar = [
@@ -107,9 +115,40 @@ describe('Flujo de perfil (e2e)', () => {
       sesionRepo.create({ usuario: usuarioCreado, perfil: perfilBootstrap }),
     );
 
+    const loginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        correo: credenciales.correo,
+        password: credenciales.password,
+      })
+      .expect(200);
+    const perfilesDisponibles = loginRes.body?.data?.posiblesPerfiles ?? [];
+    // eslint-disable-next-line no-console
+    console.log('Perfiles disponibles tras login:', perfilesDisponibles);
+    expect(perfilesDisponibles.length).toBeGreaterThan(0);
+
+    const perfilBootstrapDisponible =
+      perfilesDisponibles.find((p) => p.nombre === 'Bootstrap') ||
+      perfilesDisponibles[0];
+
+    const seleccionBootstrapRes = await request(app.getHttpServer())
+      .post('/auth/perfil')
+      .set('Authorization', `Bearer ${loginRes.body.data.accessToken}`)
+      .send({
+        id: perfilBootstrapDisponible.id,
+        nombre: perfilBootstrapDisponible.nombre,
+      })
+      .expect(200);
+
+    const tokenConPerfilBootstrap =
+      seleccionBootstrapRes.body?.data?.accessToken as string;
+    expect(
+      seleccionBootstrapRes.body?.data?.user?.perfilActivo?.id,
+    ).toBe(perfilBootstrapDisponible.id);
+
     const perfilRes = await request(app.getHttpServer())
       .post('/perfil')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${tokenConPerfilBootstrap}`)
       .send({
         nombre: 'Administrador',
         descripcion: 'Control total de perfiles',
@@ -129,6 +168,18 @@ describe('Flujo de perfil (e2e)', () => {
       sesionRepo.create({ usuario: usuarioCreado, perfil: perfilCreado }),
     );
 
+    const seleccionAdminRes = await request(app.getHttpServer())
+      .post('/auth/perfil')
+      .set('Authorization', `Bearer ${loginRes.body.data.accessToken}`)
+      .send({
+        id: perfilCreado.id,
+        nombre: perfilCreado.nombre,
+      })
+      .expect(200);
+
+    const tokenConPerfilAdmin =
+      seleccionAdminRes.body?.data?.accessToken as string;
+
     const permisosEnDb = await permisoRepo.find({
       where: { perfil: { id: perfilCreado.id } },
       relations: ['endpoint', 'perfil'],
@@ -141,7 +192,7 @@ describe('Flujo de perfil (e2e)', () => {
     // Verifica que el endpoint protegido responda distinto a 403/404 (esperamos 200)
     const usuariosRes = await request(app.getHttpServer())
       .get('/usuario')
-      .set('Authorization', `Bearer ${token}`);
+      .set('Authorization', `Bearer ${tokenConPerfilAdmin}`);
 
     expect([403, 404]).not.toContain(usuariosRes.status);
     expect(usuariosRes.status).toBe(200);

@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UsuarioService } from '../../usuario/services/usuario.service';
 import { AuthenticatedRequest } from '../jwt/JWTUser';
@@ -26,17 +31,18 @@ export class PermisosGuard implements CanActivate {
 
     const user = req.user;
     if (!user) return false;
-
+    if (!user.perfilActivo) return false;
     const rutaEstandar = this.normalizePath(context, req);
     const metodo = req.method;
     const permitido = await this.usuarioService.verficarPermiso(
       user.id,
       rutaEstandar,
       metodo,
+      user.perfilActivo.id,
     );
 
     this.logger.log(
-      `auth route=${rutaEstandar} method=${metodo} allowed=${permitido}`,
+      `auth route=${rutaEstandar} method=${metodo} perfil=(${user.perfilActivo.nombre},${user.perfilActivo.id}) allowed=${permitido}`,
     );
 
     return permitido;

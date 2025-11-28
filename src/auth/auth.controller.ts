@@ -5,6 +5,8 @@ import {
   UseGuards,
   Request,
   Get,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -25,20 +27,23 @@ import { RegisterPayloadDto } from './dto/register.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
 import * as JWTUser from '../common/jwt/JWTUser';
+import { PerfilDto } from './dto/perfil.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { PermisosGuard } from '../common/guards/permisos.guard';
 
 @ApiTags('Auth')
-@ApiExtraModels(ResultWithData, LoginResponseData, JWTUser.JwtUser)
+@ApiExtraModels(ResultWithData, LoginResponseData, JWTUser.JwtUser, PerfilDto)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Public()
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Autenticar a un usuario con sus credenciales' })
   @ApiBody({ type: LoginPayloadDto })
   @ApiOkResponse({
-    description: 'Autenticación exitosa',
+    description:
+      'Autenticación exitosa; devuelve token, usuario y perfiles disponibles',
     schema: {
       allOf: [
         { $ref: getSchemaPath(ResultWithData) },
@@ -64,7 +69,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Registrar un nuevo usuario en la plataforma' })
   @ApiBody({ type: RegisterPayloadDto })
   @ApiCreatedResponse({
-    description: 'Usuario registrado y autenticado correctamente',
+    description:
+      'Usuario registrado y autenticado correctamente; devuelve token, usuario y perfiles disponibles',
     schema: {
       allOf: [
         { $ref: getSchemaPath(ResultWithData) },
@@ -84,6 +90,41 @@ export class AuthController {
     @Body() registerDto: RegisterPayloadDto,
   ): Promise<ResultWithData<LoginResponseData>> {
     return this.authService.register(registerDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('perfil')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Seleccionar un perfil y obtener un token con permisos',
+    description:
+      'Recibe el ID de un perfil asignado al usuario, valida que tenga acceso y devuelve un JWT con ese perfil activo',
+  })
+  @ApiBearerAuth()
+  @ApiBody({ type: PerfilDto })
+  @ApiOkResponse({
+    description:
+      'Acceso concedido; devuelve token con perfil activo, usuario y lista de perfiles',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(LoginResponseData) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'Token inválido/expirado o el perfil no pertenece al usuario autenticado',
+  })
+  async gainAccess(
+    @Request() req: JWTUser.AuthenticatedRequest,
+    @Body() perfil: PerfilDto,
+  ): Promise<ResultWithData<LoginResponseData>> {
+    return this.authService.gainAccess(req.user, perfil);
   }
 
   @UseGuards(JwtAuthGuard, PermisosGuard)
