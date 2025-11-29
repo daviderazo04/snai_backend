@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Cai } from 'src/localidades/entities/cai.entity';
 import { Nacionalidad } from 'src/parametros/entities/nacionalidad.entity';
@@ -6,8 +12,9 @@ import { EstadoCivil } from 'src/parametros/entities/estadoCivil';
 import { Gdos } from 'src/parametros/entities/gdos';
 import { Etnia } from 'src/parametros/entities/etnia.entity';
 import { Canton } from 'src/localidades/entities/canton.entity';
+import { RepInfractor } from './repInfractor.entity';
 
-@Entity()
+@Entity('adolescente')
 export class Adolescente {
   @ApiProperty({ description: 'Identificador único del adolescente' })
   @PrimaryGeneratedColumn()
@@ -92,4 +99,8 @@ export class Adolescente {
   })
   @Column({ length: 255 })
   observaciones: string;
+
+  // Un adolescente puede estar en múltiples registros de  repInfractor(tener uno o varios representantes)
+  @OneToMany(() => RepInfractor, (repInfractor) => repInfractor.representante)
+  repInfractores: RepInfractor[];
 }

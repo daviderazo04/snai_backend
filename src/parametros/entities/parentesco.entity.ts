@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Estado } from '../../common/enums/estado.enum';
+import { Representante } from 'src/adolescente/entities/representante.entity';
 
 @Entity()
 export class Parentesco {
@@ -14,4 +15,7 @@ export class Parentesco {
     default: Estado.ACTIVO,
   })
   estado: Estado;
+
+  @OneToMany(() => Representante, (representante) => representante.parentesco)
+  representantes: Representante[];
 }
