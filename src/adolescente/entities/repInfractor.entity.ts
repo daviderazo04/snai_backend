@@ -8,7 +8,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class RepInfractor {
   // Muchas filas de 'repInfractor' pertenecen a un Adolescente
   @ManyToOne(() => Adolescente, (adolescente) => adolescente.repInfractores)
-  @JoinColumn({ name: 'adlc_id' }) // IMPORTANTE: Para que use el nombre de columna de tu diagrama
+  @JoinColumn({ name: 'adlc_id' })
   adolescente: Adolescente;
 
   // Muchas filas de 'repInfractor' pertenecen a un Representante
@@ -16,7 +16,7 @@ export class RepInfractor {
     () => Representante,
     (representante) => representante.repInfractores,
   )
-  @JoinColumn({ name: 'repr_id' }) // IMPORTANTE: Para que use el nombre de columna de tu diagrama
+  @JoinColumn({ name: 'repr_id' })
   representante: Representante;
 
   @ApiProperty({
@@ -31,5 +31,5 @@ export class RepInfractor {
     example: '2018-05-20',
   })
   @Column({ type: 'date', name: 'fechaFin', nullable: true })
-  fechaFin: Date;
+  fechaFin: Date | null;
 }
