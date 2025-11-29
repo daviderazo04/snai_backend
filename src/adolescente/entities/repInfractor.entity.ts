@@ -1,11 +1,20 @@
 // rep-infractor.entity.ts
-import { Entity, ManyToOne, JoinColumn, Column } from 'typeorm';
+import {
+  Entity,
+  ManyToOne,
+  JoinColumn,
+  Column,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Adolescente } from './adolescente.entity';
 import { Representante } from './representante.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('repInfractor')
 export class RepInfractor {
+  @PrimaryGeneratedColumn({ name: 'repi_id' })
+  id: number;
+
   // Muchas filas de 'repInfractor' pertenecen a un Adolescente
   @ManyToOne(() => Adolescente, (adolescente) => adolescente.repInfractores)
   @JoinColumn({ name: 'adlc_id' })
