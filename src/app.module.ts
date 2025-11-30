@@ -8,6 +8,7 @@ import { CommonModule } from './common/common.module';
 import { LocalidadesModule } from './localidades/localidades.module';
 import { ParametrosModule } from './parametros/parametros.module';
 import { AdolescenteModule } from './adolescente/adolescente.module';
+import { InfoAdolescenteModule } from './info-adolescente/info-adolescente.module';
 import 'dotenv/config';
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import 'dotenv/config';
     LocalidadesModule,
     ParametrosModule,
     AdolescenteModule,
+    InfoAdolescenteModule,
   ],
   controllers: [],
 })

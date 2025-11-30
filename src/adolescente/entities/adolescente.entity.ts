@@ -13,6 +13,8 @@ import { Gdos } from 'src/parametros/entities/gdos';
 import { Etnia } from 'src/parametros/entities/etnia.entity';
 import { Canton } from 'src/localidades/entities/canton.entity';
 import { RepInfractor } from './repInfractor.entity';
+import { Juridico } from 'src/info-adolescente/entities/juridico.entity';
+import { Ocupacion } from 'src/info-adolescente/entities/ocupacion.entity';
 
 @Entity('adolescente')
 export class Adolescente {
@@ -38,6 +40,12 @@ export class Adolescente {
 
   @ManyToOne(() => Canton, (canton) => canton.adolescentes)
   canton: Canton;
+
+  @OneToMany(() => Juridico, (juridico) => juridico.adolescente)
+  juridico: Juridico[];
+
+  @OneToMany(() => Ocupacion, (ocupacion) => ocupacion.adolescente)
+  ocupacion: Ocupacion[];
 
   // Campos de la tabla
   @ApiProperty({ description: 'Nombre del adolescente', example: 'Juan' })
