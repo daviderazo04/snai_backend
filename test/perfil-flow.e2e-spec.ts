@@ -8,6 +8,7 @@ import { Permiso } from '../src/usuario/entities/permisos.entity';
 import { Sesion } from '../src/usuario/entities/sesion.entity';
 import { Perfil } from '../src/usuario/entities/perfil.entity';
 import { Usuario } from '../src/usuario/entities/usuario.entity';
+import { ALL_ENDPOINTS } from '../src/common/constants/endpoints';
 
 // Para correrlo: configurar DB_* y JWT_SECRET apuntando a una base de pruebas y ejecutar
 // npm run test:e2e -- --runTestsByPath test/perfil-flow.e2e-spec.ts
@@ -76,25 +77,8 @@ describe('Flujo de perfil (e2e)', () => {
     expect(usuarioCreado.telefono).toBe('+593991112233');
 
     // Endpoints expuestos por la API; se registran para asignarlos al perfil de prueba
-    const endpointsARegistrar = [
-      '/auth/login',
-      '/auth/register',
-      '/auth/profile',
-      '/usuario',
-      '/usuario/perfil',
-      '/perfil',
-      '/perfil/:id',
-      '/provincias',
-      '/cantones',
-      '/cai',
-      '/estado-civil',
-      '/etnia',
-      '/gdos',
-      '/nacionalidad',
-      '/parentesco',
-    ];
     const endpointsCreados = await endpointRepo.save(
-      endpointsARegistrar.map((endpoint) =>
+      ALL_ENDPOINTS.map((endpoint) =>
         endpointRepo.create({ endpoint }),
       ),
     );

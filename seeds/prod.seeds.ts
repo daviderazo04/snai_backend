@@ -9,6 +9,7 @@ import { Usuario } from '../src/usuario/entities/usuario.entity';
 import { Sesion } from '../src/usuario/entities/sesion.entity';
 import { Sexo } from '../src/common/enums/sexo.enums';
 import { CryptService } from '../src/common/crypt.service';
+import { ALL_ENDPOINTS } from '../src/common/constants/endpoints';
 
 type SeedDeps = {
   endpointRepo: Repository<Endpoint>;
@@ -19,28 +20,9 @@ type SeedDeps = {
   sesionRepo: Repository<Sesion>;
 };
 
-const ENDPOINTS = [
-  '/auth/login',
-  '/auth/register',
-  '/auth/profile',
-  '/auth/perfil',
-  '/usuario',
-  '/usuario/perfil',
-  '/perfil',
-  '/perfil/:id',
-  '/provincias',
-  '/cantones',
-  '/cai',
-  '/estado-civil',
-  '/etnia',
-  '/gdos',
-  '/nacionalidad',
-  '/parentesco',
-];
-
 async function ensureEndpoints(deps: SeedDeps) {
   const createdOrFound: Endpoint[] = [];
-  for (const path of ENDPOINTS) {
+  for (const path of ALL_ENDPOINTS) {
     const existing = await deps.endpointRepo.findOneBy({ endpoint: path });
     if (existing) {
       createdOrFound.push(existing);

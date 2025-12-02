@@ -17,9 +17,14 @@ import { OcupacionController } from './controllers/ocupacion.controller';
 import { DelitoService } from './services/delito.service';
 import { JuridicoService } from './services/juridico.service';
 import { OcupacionService } from './services/ocupacion.service';
+import { CommonModule } from '../common/common.module';
+import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
   imports: [
+    CommonModule,
+    UsuarioModule,
+
     TypeOrmModule.forFeature([Delito, Juridico, Ocupacion, Adolescente]),
   ],
   controllers: [DelitoController, JuridicoController, OcupacionController],
