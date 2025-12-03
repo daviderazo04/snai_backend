@@ -16,6 +16,8 @@ async function bootstrap() {
     logger.error('Error al aplicar migraciones automáticamente', err as Error);
   }
 
+  app.enableCors({ origin: '*' });
+
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = new DocumentBuilder()
     .setTitle('Backend Snai')
