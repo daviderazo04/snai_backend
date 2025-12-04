@@ -28,9 +28,9 @@ export class PermisosGuard implements CanActivate {
 
     if (isPublic) return true;
 
-    const req: AuthenticatedRequest = context
+    const req = context
       .switchToHttp()
-      .getRequest<AuthenticatedRequest>();
+      .getRequest<AuthenticatedRequest & AuditedRequest>();
     const user = req.user;
 
     if (!user) return false;
@@ -55,8 +55,17 @@ export class PermisosGuard implements CanActivate {
       permitido,
       JSON.stringify(req.body),
     );
-    const auditedReq = context.switchToHttp().getRequest<AuditedRequest>();
-    auditedReq.id = idAuditable;
+
+    req.auditoriaId = idAuditable;
+
+    if (!permitido) {
+      await this.auditoriaService.completeAuditoria(
+        idAuditable,
+        false,
+        'No autorizado',
+      );
+    }
+
     return permitido;
   }
 

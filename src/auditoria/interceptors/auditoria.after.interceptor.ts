@@ -19,29 +19,41 @@ export class AuditoriaAfterInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest<AuditedRequest>();
-
     const entity = this.reflector.get(AUDIT_ENTITY_KEY, context.getHandler());
-    const idEntidad = Number(req.id);
-    const auditoriaId = req.id;
+    const idEntidad = Number(req?.params?.id);
+    const auditoriaId = req.auditoriaId;
+    const shouldCapture =
+      Boolean(entity) && Number.isFinite(idEntidad) && Boolean(auditoriaId);
 
     return next.handle().pipe(
       tap(async (response) => {
-        if (entity && idEntidad && auditoriaId) {
-          await this.auditoriaService.captureAfterState(
-            auditoriaId,
-            entity,
-            idEntidad,
-          );
-        }
+        try {
+          if (shouldCapture) {
+            await this.auditoriaService.captureAfterState(
+              auditoriaId!,
+              entity,
+              idEntidad,
+            );
+          }
 
-        if (isResponseWithData(response)) {
-          const { success, message } = response;
-
-          await this.auditoriaService.completeAuditoria(
-            auditoriaId,
-            success,
-            message,
-          );
+          if (auditoriaId) {
+            if (isResponseWithData(response)) {
+              const { success, message } = response;
+              await this.auditoriaService.completeAuditoria(
+                auditoriaId,
+                success,
+                message,
+              );
+            } else {
+              await this.auditoriaService.completeAuditoria(
+                auditoriaId,
+                true,
+              );
+            }
+          }
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err);
         }
       }),
 
@@ -49,6 +61,13 @@ export class AuditoriaAfterInterceptor implements NestInterceptor {
         if (auditoriaId) {
           this.auditoriaService
             .saveError(auditoriaId, error.message)
+            .then(() =>
+              this.auditoriaService.completeAuditoria(
+                auditoriaId,
+                false,
+                error.message,
+              ),
+            )
             .catch(console.error);
         }
 

@@ -35,11 +35,12 @@ export class AuditoriaService {
     errorMessage?: string,
   ) {
     const auditoria = await this.auditoriaRepo.findOneBy({ id: auditoriaId });
-    auditoria!.completado = sucess;
+    if (!auditoria) return;
+    auditoria.completado = sucess;
     if (!sucess && errorMessage) {
-      auditoria!.error = errorMessage;
+      auditoria.error = errorMessage;
     }
-    await this.auditoriaRepo.save(auditoria!);
+    await this.auditoriaRepo.save(auditoria);
   }
 
   async captureBeforeState<T extends ObjectLiteral>(

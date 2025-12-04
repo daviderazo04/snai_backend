@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuditoriaService } from '../auditoria.service';
-import { Observable } from 'rxjs';
+import { Observable, from, switchMap } from 'rxjs';
 import { AUDIT_ENTITY_KEY } from '../decorators/auditar.decorator';
 import { AuditedRequest } from '../../common/request/AuditedRequest';
 
@@ -19,17 +19,22 @@ export class AuditoriaBeforeInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest<AuditedRequest>();
-
     const entity = this.reflector.get(AUDIT_ENTITY_KEY, context.getHandler());
-    const idEntidad = Number(req?.id);
-    const auditoriaId = req.id;
+    const idEntidad = Number(req?.params?.id);
+    const auditoriaId = req.auditoriaId;
+    const shouldCapture =
+      Boolean(entity) && Number.isFinite(idEntidad) && Boolean(auditoriaId);
 
-    if (entity && idEntidad && auditoriaId) {
-      this.auditoriaService
-        .captureBeforeState(auditoriaId, entity, idEntidad)
-        .catch(console.error);
-    }
+    const beforeState = shouldCapture
+      ? this.auditoriaService
+          .captureBeforeState(auditoriaId!, entity, idEntidad)
+          .catch((err) => {
+            // No interrumpir la petición si la auditoría falla
+            // eslint-disable-next-line no-console
+            console.error(err);
+          })
+      : Promise.resolve();
 
-    return next.handle();
+    return from(beforeState).pipe(switchMap(() => next.handle()));
   }
 }
