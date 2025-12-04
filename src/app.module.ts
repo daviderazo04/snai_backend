@@ -9,6 +9,7 @@ import { LocalidadesModule } from './localidades/localidades.module';
 import { ParametrosModule } from './parametros/parametros.module';
 import { AdolescenteModule } from './adolescente/adolescente.module';
 import { InfoAdolescenteModule } from './info-adolescente/info-adolescente.module';
+import { AuditoriaModule } from './auditoria/auditoria.module';
 import 'dotenv/config';
 @Module({
   imports: [
@@ -38,11 +39,12 @@ import 'dotenv/config';
     }),
     UsuarioModule,
     AuthModule,
-    CommonModule,
     LocalidadesModule,
     ParametrosModule,
     AdolescenteModule,
     InfoAdolescenteModule,
+    AuditoriaModule,
+    CommonModule,
   ],
   controllers: [],
 })

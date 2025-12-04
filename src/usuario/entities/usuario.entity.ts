@@ -10,6 +10,7 @@ import { Estado } from '../../common/enums/estado.enum';
 import { Sesion } from './sesion.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sexo } from '../../common/enums/sexo.enums';
+import { Auditoria } from '../../auditoria/entities/auditoria.entity';
 
 @Entity()
 export class Usuario {
@@ -46,6 +47,8 @@ export class Usuario {
     array: false,
     default: Estado.ACTIVO,
   })
+  @OneToMany(() => Auditoria, (auditoria) => auditoria.usuario)
+  auditorias: Auditoria[];
   @ApiProperty({ enum: Estado })
   estado: Estado;
   @ApiProperty()

@@ -39,6 +39,10 @@ export class GdosService {
       nombre: payload.nombre,
     });
     const savedGdos = await this.gdosRepository.save(gdo);
-    return new ResultWithData<Gdos>(true, 'Gdos creado exitosamente', savedGdos);
+    return new ResultWithData<Gdos>(
+      true,
+      'Gdos creado exitosamente',
+      savedGdos,
+    );
   }
 }

@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -11,20 +22,27 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { ProvinciaPayloadDto } from '../dto/provincia.payload.dto';
-import { LocalidadService } from '../services/localidad.service';
+import { ProvinciaService } from '../services/provincia.service';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { Provincia } from '../entities/provincia.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
+import * as AuditedRequest from '../../common/request/AuditedRequest';
+import { ProvinciaUpdatePayloadDto } from '../dto/provincia.update.payload.dto';
+import { AuditoriaService } from '../../auditoria/auditoria.service';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Provincias')
 @ApiExtraModels(ResultWithData, PaginatedResult, Provincia)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('provincias')
 export class ProvinciasController {
-  constructor(private readonly localidadService: LocalidadService) {}
-
+  constructor(
+    private readonly provinciaService: ProvinciaService,
+    private readonly auditoriaService: AuditoriaService,
+  ) {}
+  @Auditar(Provincia)
   @Post()
   @ApiOperation({ summary: 'Crear una nueva provincia' })
   @ApiBody({ type: ProvinciaPayloadDto })
@@ -48,7 +66,7 @@ export class ProvinciasController {
   async createProvincia(
     @Body() provincia: ProvinciaPayloadDto,
   ): Promise<ResultWithData<Provincia>> {
-    return this.localidadService.createProvincia(provincia);
+    return this.provinciaService.createProvincia(provincia);
   }
 
   @Get()
@@ -79,6 +97,33 @@ export class ProvinciasController {
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
   ): Promise<PaginatedResult<Provincia>> {
-    return this.localidadService.getPaginatedProvincia(nombre, page, size);
+    return this.provinciaService.getPaginatedProvincia(nombre, page, size);
+  }
+  @Auditar(Provincia)
+  @Put('/:id')
+  @ApiOperation({ summary: 'Actualizar una provincia por id' })
+  @ApiBody({ type: ProvinciaUpdatePayloadDto })
+  @ApiOkResponse({
+    description: 'Provincia actualizada correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Provincia) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiBadRequestResponse({
+    description:
+      'El payload no cumple las validaciones o la provincia no existe',
+  })
+  async updateProvincia(
+    @Body() payload: ProvinciaUpdatePayloadDto,
+    @Param('id') id: number,
+  ): Promise<ResultWithData<Provincia>> {
+    return await this.provinciaService.updateProvincia(id, payload);
   }
 }

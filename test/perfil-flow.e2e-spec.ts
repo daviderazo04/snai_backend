@@ -78,9 +78,7 @@ describe('Flujo de perfil (e2e)', () => {
 
     // Endpoints expuestos por la API; se registran para asignarlos al perfil de prueba
     const endpointsCreados = await endpointRepo.save(
-      ALL_ENDPOINTS.map((endpoint) =>
-        endpointRepo.create({ endpoint }),
-      ),
+      ALL_ENDPOINTS.map((endpoint) => endpointRepo.create({ endpoint })),
     );
 
     // Perfil y sesión temporales para que el usuario pueda invocar endpoints protegidos
@@ -112,7 +110,7 @@ describe('Flujo de perfil (e2e)', () => {
       })
       .expect(200);
     const perfilesDisponibles = loginRes.body?.data?.posiblesPerfiles ?? [];
-    // eslint-disable-next-line no-console
+
     console.log('Perfiles disponibles tras login:', perfilesDisponibles);
     expect(perfilesDisponibles.length).toBeGreaterThan(0);
 
@@ -129,11 +127,11 @@ describe('Flujo de perfil (e2e)', () => {
       })
       .expect(200);
 
-    const tokenConPerfilBootstrap =
-      seleccionBootstrapRes.body?.data?.accessToken as string;
-    expect(
-      seleccionBootstrapRes.body?.data?.user?.perfilActivo?.id,
-    ).toBe(perfilBootstrapDisponible.id);
+    const tokenConPerfilBootstrap = seleccionBootstrapRes.body?.data
+      ?.accessToken as string;
+    expect(seleccionBootstrapRes.body?.data?.user?.perfilActivo?.id).toBe(
+      perfilBootstrapDisponible.id,
+    );
 
     const perfilRes = await request(app.getHttpServer())
       .post('/perfil')
@@ -166,8 +164,8 @@ describe('Flujo de perfil (e2e)', () => {
       })
       .expect(200);
 
-    const tokenConPerfilAdmin =
-      seleccionAdminRes.body?.data?.accessToken as string;
+    const tokenConPerfilAdmin = seleccionAdminRes.body?.data
+      ?.accessToken as string;
 
     const permisosEnDb = await permisoRepo.find({
       where: { perfil: { id: perfilCreado.id } },

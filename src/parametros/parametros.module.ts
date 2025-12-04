@@ -15,12 +15,10 @@ import { NacionalidadService } from './services/nacionalidad.service';
 import { NacionalidadController } from './controllers/nacionalidad.controller';
 import { ParentescoService } from './services/parentesco.service';
 import { ParentescoController } from './controllers/parentesco.controller';
-import { CommonModule } from '../common/common.module';
 import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
   imports: [
-    CommonModule,
     UsuarioModule,
     TypeOrmModule.forFeature([
       EstadoCivil,

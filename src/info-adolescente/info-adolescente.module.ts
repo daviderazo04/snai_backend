@@ -22,7 +22,6 @@ import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
   imports: [
-    CommonModule,
     UsuarioModule,
 
     TypeOrmModule.forFeature([Delito, Juridico, Ocupacion, Adolescente]),

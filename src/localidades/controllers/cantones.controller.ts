@@ -14,7 +14,7 @@ import { CantonPayload } from '../dto/canton.payload.dto';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { Canton } from '../entities/canton.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
-import { LocalidadService } from '../services/localidad.service';
+import { CantonService } from '../services/canton.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 
@@ -23,7 +23,7 @@ import { PermisosGuard } from '../../common/guards/permisos.guard';
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('cantones')
 export class CantonesController {
-  constructor(private readonly localidadService: LocalidadService) {}
+  constructor(private readonly cantonService: CantonService) {}
 
   @Post()
   @ApiOperation({ summary: 'Crear un cantón asociado a una provincia' })
@@ -48,7 +48,7 @@ export class CantonesController {
   async createCanton(
     @Body() payload: CantonPayload,
   ): Promise<ResultWithData<Canton>> {
-    return this.localidadService.createCanton(payload);
+    return this.cantonService.createCanton(payload);
   }
 
   @Get()
@@ -77,6 +77,6 @@ export class CantonesController {
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
   ): Promise<PaginatedResult<Canton>> {
-    return this.localidadService.getPaginatedCanton(nombre, page, size);
+    return this.cantonService.getPaginatedCanton(nombre, page, size);
   }
 }

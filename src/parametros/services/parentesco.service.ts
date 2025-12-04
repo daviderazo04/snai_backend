@@ -42,8 +42,7 @@ export class ParentescoService {
     const parentesco = this.parentescoRepository.create({
       nombre: payload.nombre,
     });
-    const savedParentesco =
-      await this.parentescoRepository.save(parentesco);
+    const savedParentesco = await this.parentescoRepository.save(parentesco);
     return new ResultWithData<Parentesco>(
       true,
       'Parentesco creado exitosamente',

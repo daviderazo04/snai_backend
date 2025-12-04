@@ -9,7 +9,6 @@ import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
-    CommonModule,
     UsuarioModule,
     PassportModule,
     JwtModule.registerAsync({

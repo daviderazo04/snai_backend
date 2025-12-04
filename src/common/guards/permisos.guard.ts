@@ -7,6 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { UsuarioService } from '../../usuario/services/usuario.service';
 import { AuthenticatedRequest } from '../jwt/JWTUser';
+import { AuditoriaService } from '../../auditoria/auditoria.service';
+import { AuditedRequest } from '../request/AuditedRequest';
 
 @Injectable()
 export class PermisosGuard implements CanActivate {
@@ -15,6 +17,7 @@ export class PermisosGuard implements CanActivate {
   constructor(
     private readonly usuarioService: UsuarioService,
     private readonly reflector: Reflector,
+    private readonly auditoriaService: AuditoriaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +31,6 @@ export class PermisosGuard implements CanActivate {
     const req: AuthenticatedRequest = context
       .switchToHttp()
       .getRequest<AuthenticatedRequest>();
-
     const user = req.user;
 
     if (!user) return false;
@@ -45,7 +47,16 @@ export class PermisosGuard implements CanActivate {
     this.logger.log(
       `auth route=${rutaEstandar} method=${metodo} perfil=(${user.perfilActivo.nombre},${user.perfilActivo.id}) allowed=${permitido}`,
     );
-
+    const rutaAuditoria = this.getAuditPath(req);
+    const idAuditable = await this.auditoriaService.createAuditoria(
+      user.id,
+      rutaAuditoria,
+      metodo,
+      permitido,
+      JSON.stringify(req.body),
+    );
+    const auditedReq = context.switchToHttp().getRequest<AuditedRequest>();
+    auditedReq.id = idAuditable;
     return permitido;
   }
 
@@ -62,6 +73,7 @@ export class PermisosGuard implements CanActivate {
   ): string {
     // Preferimos la ruta que Express resolvió (incluye params como "/:id")
     const baseUrl = req.baseUrl ?? '';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
     const routePath = req.route?.path ?? '';
 
     let combined = `${baseUrl}${routePath}`;
@@ -85,6 +97,21 @@ export class PermisosGuard implements CanActivate {
     }
 
     // Limpia dobles slashes y quita trailing slash
-    return combined.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+    combined = combined.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+
+    // Elimina segmentos numéricos o dinámicos (p. ej. :id) para que /provincias/:id y /provincias/2 se traten igual
+    const cleanedSegments = combined
+      .split('/')
+      .filter(Boolean)
+      .filter(
+        (segment) => !segment.startsWith(':') && !/^[0-9]+$/.test(segment),
+      );
+
+    return cleanedSegments.length > 0 ? `/${cleanedSegments.join('/')}` : '/';
+  }
+
+  private getAuditPath(req: AuthenticatedRequest): string {
+    const raw = (req.originalUrl ?? req.url ?? '').trim();
+    return raw || '/';
   }
 }

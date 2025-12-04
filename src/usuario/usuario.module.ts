@@ -11,10 +11,10 @@ import { PerfilController } from './controllers/perfil.controller';
 import { RolesService } from './services/roles.service';
 import { UsuarioController } from './controllers/usuario.controller';
 import { PermisosGuard } from '../common/guards/permisos.guard';
+import { AuditoriaModule } from '../auditoria/auditoria.module';
 
 @Module({
   imports: [
-    CommonModule,
     TypeOrmModule.forFeature([Usuario, Endpoint, Perfil, Permiso, Sesion]),
   ],
   providers: [UsuarioService, RolesService, PermisosGuard],

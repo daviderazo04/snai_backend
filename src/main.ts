@@ -1,8 +1,10 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { DataSource } from 'typeorm';
+import { AuditoriaBeforeInterceptor } from './auditoria/interceptors/auditoria.before.interceptor';
+import { AuditoriaAfterInterceptor } from './auditoria/interceptors/auditoria.after.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,6 +27,11 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('back')
     .build();
+  const beforeInterceptor = app.get(AuditoriaBeforeInterceptor);
+  const afterInterceptor = app.get(AuditoriaAfterInterceptor);
+
+  app.useGlobalInterceptors(beforeInterceptor, afterInterceptor);
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 

@@ -19,7 +19,6 @@ import { RepInfractorService } from './services/repInfractor.service';
 
 @Module({
   imports: [
-    CommonModule,
     UsuarioModule,
     TypeOrmModule.forFeature([
       Adolescente,
