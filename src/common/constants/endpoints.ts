@@ -4,7 +4,7 @@ export const ALL_ENDPOINTS = [
   '/auth/login',
   '/auth/register',
   '/auth/profile',
-  '/auth/perfil',
+  '/auth/gain-access',
   // Usuario y perfiles
   '/usuario',
   '/usuario/perfil',

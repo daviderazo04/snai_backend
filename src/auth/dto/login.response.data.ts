@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { JwtUser } from '../../common/jwt/JWTUser';
 import { PerfilDto } from './perfil.dto';
+import { PermisoFlatResponseDto } from '../../usuario/dto/permiso.flat.response.dto';
 
 export class LoginResponseData {
   @ApiProperty({
@@ -26,14 +27,17 @@ export class LoginResponseData {
     ],
   })
   posiblesPerfiles: PerfilDto[];
+  permisos: PermisoFlatResponseDto[];
 
   constructor(
     accessToken: string,
     user: JwtUser,
-    posiblesPerfiles: PerfilDto[],
+    posiblesPerfiles: PerfilDto[] = [],
+    permisos: PermisoFlatResponseDto[] = [],
   ) {
     this.accessToken = accessToken;
     this.user = user;
     this.posiblesPerfiles = posiblesPerfiles;
+    this.permisos = permisos;
   }
 }

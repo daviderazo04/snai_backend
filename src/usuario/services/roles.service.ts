@@ -11,6 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PerfilAsignarPayload } from '../dto/perfil.asignar.payload.dto';
 import { Usuario } from '../entities/usuario.entity';
 import { Sesion } from '../entities/sesion.entity';
+import { PerfilDto } from '../../auth/dto/perfil.dto';
+import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
 
 @Injectable()
 export class RolesService {
@@ -19,6 +21,17 @@ export class RolesService {
     @InjectRepository(Perfil)
     private readonly perfilesRepository: Repository<Perfil>,
   ) {}
+  async getFlatPermisosDePerfil(
+    perfilId: number,
+  ): Promise<PermisoFlatResponseDto[]> {
+    const perfil = await this.perfilesRepository.findOne({
+      where: { id: perfilId },
+      relations: ['permisos'],
+    });
+    return perfil!.permisos.map(
+      (p) => new PermisoFlatResponseDto(p.endpoint.endpoint, p.EDIT, p.VIEW),
+    );
+  }
   async updatePerfil(
     id: number,
     payload: PerfilUpdatePayloadDto,

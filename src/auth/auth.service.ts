@@ -10,11 +10,13 @@ import { LoginResponseData } from './dto/login.response.data';
 import { JwtUser } from '../common/jwt/JWTUser';
 import * as JWTUser from '../common/jwt/JWTUser';
 import { PerfilDto } from './dto/perfil.dto';
+import { RolesService } from '../usuario/services/roles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usuarioService: UsuarioService,
+    private roleService: RolesService,
     private cryptService: CryptService,
     private jwtService: JwtService,
   ) {}
@@ -48,6 +50,7 @@ export class AuthService {
         'No tiene autorizacion para usar este perfil',
         null,
       );
+    const permisos = await this.roleService.getFlatPermisosDePerfil(payload.id);
     const authUser = await this.usuarioService.getUsuarioById(user.id);
     const access_token = this.generateToken(authUser!, payload);
     return new ResultWithData<LoginResponseData>(
@@ -57,6 +60,7 @@ export class AuthService {
         access_token,
         new JwtUser(authUser!, payload),
         perfilesDisponibles,
+        permisos,
       ),
     );
   }

@@ -8,6 +8,7 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { ILike } from 'typeorm';
 import { PerfilDto } from '../../auth/dto/perfil.dto';
 import { Perfil } from '../entities/perfil.entity';
+import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -124,6 +125,7 @@ export class UsuarioService {
       return new PaginatedResult(perfiles, totalPages, page, size);
     }
   }
+
   async getUsuarioById(id: number): Promise<Usuario | null> {
     return this.userRepository.findOne({ where: { id } });
   }

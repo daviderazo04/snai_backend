@@ -93,18 +93,18 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('perfil')
+  @Post('gain-access')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Seleccionar un perfil y obtener un token con permisos',
+    summary: 'Obtener un JWT firmado para un perfil específico',
     description:
-      'Recibe el ID de un perfil asignado al usuario, valida que tenga acceso y devuelve un JWT con ese perfil activo',
+      'Recibe el ID de un perfil asignado al usuario, valida que tenga acceso y devuelve un JWT firmado con ese perfil activo y sus permisos',
   })
   @ApiBearerAuth()
   @ApiBody({ type: PerfilDto })
   @ApiOkResponse({
     description:
-      'Acceso concedido; devuelve token con perfil activo, usuario y lista de perfiles',
+      'Acceso concedido; devuelve JWT firmado con el perfil activo, usuario y lista de perfiles',
     schema: {
       allOf: [
         { $ref: getSchemaPath(ResultWithData) },

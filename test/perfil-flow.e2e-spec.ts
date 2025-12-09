@@ -119,7 +119,7 @@ describe('Flujo de perfil (e2e)', () => {
       perfilesDisponibles[0];
 
     const seleccionBootstrapRes = await request(app.getHttpServer())
-      .post('/auth/perfil')
+      .post('/auth/gain-access')
       .set('Authorization', `Bearer ${loginRes.body.data.accessToken}`)
       .send({
         id: perfilBootstrapDisponible.id,
@@ -156,7 +156,7 @@ describe('Flujo de perfil (e2e)', () => {
     );
 
     const seleccionAdminRes = await request(app.getHttpServer())
-      .post('/auth/perfil')
+      .post('/auth/gain-access')
       .set('Authorization', `Bearer ${loginRes.body.data.accessToken}`)
       .send({
         id: perfilCreado.id,
