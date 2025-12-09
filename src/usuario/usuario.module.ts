@@ -17,8 +17,8 @@ import { AuditoriaModule } from '../auditoria/auditoria.module';
   imports: [
     TypeOrmModule.forFeature([Usuario, Endpoint, Perfil, Permiso, Sesion]),
   ],
-  providers: [UsuarioService, RolesService, PermisosGuard],
-  exports: [UsuarioService, PermisosGuard],
+  providers: [UsuarioService, RolesService, PermisosGuard, RolesService],
+  exports: [UsuarioService, PermisosGuard, RolesService],
   controllers: [PerfilController, UsuarioController],
 })
 export class UsuarioModule {}
