@@ -1,18 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumberString, MaxLength } from 'class-validator';
 
 export class LoginPayloadDto {
   @ApiProperty({
-    example: 'usuario@correo.com',
-    description: 'Correo electrónico registrado del usuario',
+    example: '0954321876',
+    description: 'Cédula registrada del usuario',
   })
-  @IsEmail()
+  @IsNumberString()
+  @MaxLength(10)
   @IsNotEmpty()
-  correo: string;
+  cedula: string;
 
   @ApiProperty({
     example: 'Password123',
-    description: 'Contraseña asociada al correo electrónico',
+    description: 'Contraseña asociada a la cédula del usuario',
   })
   @IsNotEmpty()
   password: string;

@@ -22,17 +22,20 @@ type SeedDeps = {
 
 async function ensureEndpoints(deps: SeedDeps) {
   const createdOrFound: Endpoint[] = [];
-  for (const path of ALL_ENDPOINTS) {
-    const existing = await deps.endpointRepo.findOneBy({ endpoint: path });
-    if (existing) {
-      createdOrFound.push(existing);
-      continue;
+  for (const { endpoint: path, descripcion } of ALL_ENDPOINTS) {
+    let endpoint = await deps.endpointRepo.findOneBy({ endpoint: path });
+    if (!endpoint) {
+      endpoint = deps.endpointRepo.create({ endpoint: path, descripcion });
+      endpoint = await deps.endpointRepo.save(endpoint);
+      // eslint-disable-next-line no-console
+      console.log(`Endpoint creado: ${path}`);
+    } else if (!endpoint.descripcion || endpoint.descripcion !== descripcion) {
+      endpoint.descripcion = descripcion;
+      endpoint = await deps.endpointRepo.save(endpoint);
+      // eslint-disable-next-line no-console
+      console.log(`Endpoint actualizado: ${path}`);
     }
-    const nuevo = deps.endpointRepo.create({ endpoint: path });
-    const saved = await deps.endpointRepo.save(nuevo);
-    createdOrFound.push(saved);
-    // eslint-disable-next-line no-console
-    console.log(`Endpoint creado: ${path}`);
+    createdOrFound.push(endpoint);
   }
   return createdOrFound;
 }
@@ -85,6 +88,7 @@ async function ensureAdminUsuario(
 ): Promise<Usuario> {
   // eslint-disable-next-line no-console
   console.log('== Creando usuario administrador (idempotente) ==');
+  const cedula = process.env.SEED_ADMIN_CEDULA ?? '1717171717';
   const correo = process.env.SEED_ADMIN_EMAIL ?? 'admin@snai.local';
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!';
   const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Admin';
@@ -99,17 +103,20 @@ async function ensureAdminUsuario(
   console.log(
     `Columnas detectadas en usuario: ${Array.from(columns).join(', ')}`,
   );
+  if (!columns.has('cedula')) {
+    throw new Error('La columna "cedula" es requerida para el seed.');
+  }
 
   const [found] = await deps.dataSource.query(
-    `SELECT id FROM "usuario" WHERE correo = $1 LIMIT 1`,
-    [correo],
+    `SELECT id, cedula, correo FROM "usuario" WHERE correo = $1 OR cedula = $2 LIMIT 1`,
+    [correo, cedula],
   );
 
   let usuarioId: number;
   if (!found) {
     const hashed = await deps.cryptService.crypt(password);
-    const colNames = ['correo', 'password', 'nombre', 'apellido'];
-    const values: unknown[] = [correo, hashed, nombre, apellido];
+    const colNames = ['cedula', 'correo', 'password', 'nombre', 'apellido'];
+    const values: unknown[] = [cedula, correo, hashed, nombre, apellido];
 
     if (columns.has('sexo')) {
       colNames.push('sexo');
@@ -131,11 +138,27 @@ async function ensureAdminUsuario(
     const [inserted] = await deps.dataSource.query(insertSql, values);
     usuarioId = inserted.id as number;
     // eslint-disable-next-line no-console
-    console.log(`Usuario administrador creado: ${correo} (id=${usuarioId})`);
+    console.log(
+      `Usuario administrador creado: ${correo} (cedula=${cedula}, id=${usuarioId})`,
+    );
   } else {
     usuarioId = found.id as number;
     // eslint-disable-next-line no-console
-    console.log(`Usuario administrador ya existe: ${correo} (id=${usuarioId})`);
+    console.log(
+      `Usuario administrador ya existe: ${found.correo ?? correo} (cedula=${
+        found.cedula ?? 'sin cedula'
+      }, id=${usuarioId})`,
+    );
+    if (!found.cedula) {
+      await deps.dataSource.query(
+        `UPDATE "usuario" SET cedula = $1 WHERE id = $2`,
+        [cedula, usuarioId],
+      );
+      // eslint-disable-next-line no-console
+      console.log(
+        `Cedula asignada al usuario administrador para soportar login: ${cedula}`,
+      );
+    }
   }
 
   const [sesion] = await deps.dataSource.query(

@@ -3,12 +3,23 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumberString,
   IsPhoneNumber,
   IsString,
+  MaxLength,
 } from 'class-validator';
 import { Sexo } from '../../common/enums/sexo.enums';
 
 export class RegisterPayloadDto {
+  @ApiProperty({
+    example: '0954321876',
+    description: 'Cédula única del usuario a registrar',
+  })
+  @IsNumberString()
+  @MaxLength(10)
+  @IsNotEmpty()
+  cedula: string;
+
   @ApiProperty({
     example: 'nuevo.usuario@correo.com',
     description: 'Correo electrónico único del usuario a registrar',

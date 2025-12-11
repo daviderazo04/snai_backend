@@ -26,11 +26,19 @@ export class RolesService {
   ): Promise<PermisoFlatResponseDto[]> {
     const perfil = await this.perfilesRepository.findOne({
       where: { id: perfilId },
-      relations: ['permisos'],
+      relations: ['permisos', 'permisos.endpoint'],
     });
-    return perfil!.permisos.map(
-      (p) => new PermisoFlatResponseDto(p.endpoint.endpoint, p.EDIT, p.VIEW),
-    );
+    if (!perfil) return [];
+
+    return perfil.permisos.map((p) => {
+      const endpoint = p.endpoint;
+      return new PermisoFlatResponseDto(
+        endpoint?.endpoint ?? '',
+        p.EDIT,
+        p.VIEW,
+        endpoint?.descripcion ?? '',
+      );
+    });
   }
   async updatePerfil(
     id: number,

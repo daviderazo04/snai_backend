@@ -18,6 +18,9 @@ export class Usuario {
   @PrimaryGeneratedColumn()
   id: number;
   @ApiProperty()
+  @Column({ unique: true })
+  cedula: string;
+  @ApiProperty()
   @Column()
   nombre: string;
   @ApiProperty()
@@ -47,10 +50,10 @@ export class Usuario {
     array: false,
     default: Estado.ACTIVO,
   })
-  @OneToMany(() => Auditoria, (auditoria) => auditoria.usuario)
-  auditorias: Auditoria[];
   @ApiProperty({ enum: Estado })
   estado: Estado;
+  @OneToMany(() => Auditoria, (auditoria) => auditoria.usuario)
+  auditorias: Auditoria[];
   @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -39,7 +39,9 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Autenticar a un usuario con sus credenciales' })
+  @ApiOperation({
+    summary: 'Autenticar a un usuario con su cedula y contraseña',
+  })
   @ApiBody({ type: LoginPayloadDto })
   @ApiOkResponse({
     description:
@@ -84,7 +86,7 @@ export class AuthController {
   })
   @ApiBadRequestResponse({
     description:
-      'La información proporcionada no es válida o el correo ya existe',
+      'La información proporcionada no es válida o la cédula/correo ya existe',
   })
   async register(
     @Body() registerDto: RegisterPayloadDto,

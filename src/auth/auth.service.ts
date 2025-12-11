@@ -26,10 +26,10 @@ export class AuthService {
     return access_token;
   }
   async validateUser(
-    correo: string,
+    cedula: string,
     password: string,
   ): Promise<Usuario | null> {
-    const user = await this.usuarioService.findByCorreo(correo);
+    const user = await this.usuarioService.findByCedula(cedula);
     if (user == null) return null;
     if (await this.cryptService.compare(password, user.password)) {
       return user;
@@ -67,7 +67,7 @@ export class AuthService {
   async login(
     loginDto: LoginPayloadDto,
   ): Promise<ResultWithData<LoginResponseData>> {
-    const user = await this.validateUser(loginDto.correo, loginDto.password);
+    const user = await this.validateUser(loginDto.cedula, loginDto.password);
     if (!user) {
       return new ResultWithData<LoginResponseData>(
         false,
@@ -89,13 +89,23 @@ export class AuthService {
     userData: RegisterPayloadDto,
   ): Promise<ResultWithData<LoginResponseData>> {
     // Verificar si el usuario ya existe
-    const existingUser = await this.usuarioService.findByCorreo(
-      userData.correo,
+    const existingCedula = await this.usuarioService.findByCedula(
+      userData.cedula,
     );
-    if (existingUser) {
+    if (existingCedula) {
       return new ResultWithData<LoginResponseData>(
         false,
-        'Registro fallido',
+        'Registro fallido: la cédula ya se encuentra registrada',
+        null,
+      );
+    }
+    const existingCorreo = await this.usuarioService.findByCorreo(
+      userData.correo,
+    );
+    if (existingCorreo) {
+      return new ResultWithData<LoginResponseData>(
+        false,
+        'Registro fallido: el correo ya se encuentra registrado',
         null,
       );
     }

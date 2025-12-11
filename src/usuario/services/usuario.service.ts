@@ -78,8 +78,12 @@ export class UsuarioService {
     return false;
   }
 
+  async findByCedula(cedula: string): Promise<Usuario | null> {
+    return this.userRepository.findOne({ where: { cedula: cedula } });
+  }
+
   async findByCorreo(correo: string): Promise<Usuario | null> {
-    return this.userRepository.findOne({ where: { correo } });
+    return this.userRepository.findOne({ where: { correo: correo } });
   }
   async getSanitizedUsuarios(
     nombre: string = '',

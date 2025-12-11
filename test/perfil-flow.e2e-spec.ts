@@ -9,6 +9,7 @@ import { Sesion } from '../src/usuario/entities/sesion.entity';
 import { Perfil } from '../src/usuario/entities/perfil.entity';
 import { Usuario } from '../src/usuario/entities/usuario.entity';
 import { ALL_ENDPOINTS } from '../src/common/constants/endpoints';
+import { Auditoria } from '../src/auditoria/entities/auditoria.entity';
 
 // Para correrlo: configurar DB_* y JWT_SECRET apuntando a una base de pruebas y ejecutar
 // npm run test:e2e -- --runTestsByPath test/perfil-flow.e2e-spec.ts
@@ -21,6 +22,7 @@ describe('Flujo de perfil (e2e)', () => {
   let sesionRepo: Repository<Sesion>;
   let perfilRepo: Repository<Perfil>;
   let usuarioRepo: Repository<Usuario>;
+  let auditoriaRepo: Repository<Auditoria>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -36,6 +38,7 @@ describe('Flujo de perfil (e2e)', () => {
     sesionRepo = dataSource.getRepository(Sesion);
     perfilRepo = dataSource.getRepository(Perfil);
     usuarioRepo = dataSource.getRepository(Usuario);
+    auditoriaRepo = dataSource.getRepository(Auditoria);
   });
 
   afterAll(async () => {
@@ -43,6 +46,7 @@ describe('Flujo de perfil (e2e)', () => {
   });
 
   const clearDatabase = async () => {
+    await auditoriaRepo.createQueryBuilder().delete().execute();
     await permisoRepo.createQueryBuilder().delete().execute();
     await sesionRepo.createQueryBuilder().delete().execute();
     await endpointRepo.createQueryBuilder().delete().execute();
@@ -54,6 +58,7 @@ describe('Flujo de perfil (e2e)', () => {
     await clearDatabase();
 
     const credenciales = {
+      cedula: '0954321876',
       correo: 'perfil.e2e@example.com',
       password: 'Password123!',
       nombre: 'Perfil',
@@ -70,16 +75,27 @@ describe('Flujo de perfil (e2e)', () => {
     expect(registerRes.body.success).toBe(true);
 
     const usuarioCreado = await usuarioRepo.findOneByOrFail({
-      correo: credenciales.correo,
+      cedula: credenciales.cedula,
     });
+    expect(usuarioCreado.correo).toBe(credenciales.correo);
     expect(usuarioCreado.sexo).toBe('MASCULINO');
     expect(usuarioCreado.direccion).toBe('Av. Siempre Viva 123');
     expect(usuarioCreado.telefono).toBe('+593991112233');
 
     // Endpoints expuestos por la API; se registran para asignarlos al perfil de prueba
     const endpointsCreados = await endpointRepo.save(
-      ALL_ENDPOINTS.map((endpoint) => endpointRepo.create({ endpoint })),
+      ALL_ENDPOINTS.map(({ endpoint, descripcion }) =>
+        endpointRepo.create({ endpoint, descripcion }),
+      ),
     );
+    const endpointsEsperados = new Map(
+      ALL_ENDPOINTS.map(({ endpoint, descripcion }) => [endpoint, descripcion]),
+    );
+    endpointsCreados.forEach((endpoint) => {
+      expect(endpoint.descripcion).toBe(
+        endpointsEsperados.get(endpoint.endpoint),
+      );
+    });
 
     // Perfil y sesión temporales para que el usuario pueda invocar endpoints protegidos
     const perfilBootstrap = await perfilRepo.save(
@@ -105,7 +121,7 @@ describe('Flujo de perfil (e2e)', () => {
     const loginRes = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        correo: credenciales.correo,
+        cedula: credenciales.cedula,
         password: credenciales.password,
       })
       .expect(200);

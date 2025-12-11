@@ -14,6 +14,8 @@ export class Endpoint {
   @Column()
   @Unique(['endpoint'])
   endpoint: string;
+  @Column()
+  descripcion: string;
   @OneToMany(() => Permiso, (permiso) => permiso.endpoint)
   permisos: Permiso[];
 }
