@@ -7,6 +7,7 @@ import {
   IsString,
   MaxLength,
   Min,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateOcupacionDto {
@@ -14,6 +15,14 @@ export class CreateOcupacionDto {
   @IsNumber()
   @IsNotEmpty()
   adolescenteId: number;
+
+  @ApiProperty({
+    description: 'Fecha de la ocupación',
+    example: '2024-05-20',
+  })
+  @IsDateString()
+  @IsNotEmpty()
+  fecha: Date;
 
   @ApiProperty({
     description: 'Nombre del taller o actividad',

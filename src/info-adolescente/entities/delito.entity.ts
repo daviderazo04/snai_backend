@@ -9,7 +9,7 @@ export class Delito {
   id: number;
 
   @ApiProperty({ description: 'Nombre del delito', example: 'Robo' })
-  @Column({ type: 'varchar', length: 63, nullable: false })
+  @Column({ name: 'nombre', type: 'varchar', length: 63, nullable: false })
   nombre: string;
 
   // Relación inversa: Un delito puede aparecer en muchos registros jurídicos
