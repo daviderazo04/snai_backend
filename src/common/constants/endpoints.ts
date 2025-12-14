@@ -28,6 +28,10 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     endpoint: '/usuario/perfil',
     descripcion: 'Asignacion de perfiles a usuarios',
   },
+  {
+    endpoint: '/endpoints',
+    descripcion: 'Listado aplanado de endpoints disponibles',
+  },
   { endpoint: '/perfil', descripcion: 'Creacion de perfiles y permisos' },
   {
     endpoint: '/perfil/:id',

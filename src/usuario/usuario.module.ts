@@ -12,13 +12,20 @@ import { RolesService } from './services/roles.service';
 import { UsuarioController } from './controllers/usuario.controller';
 import { PermisosGuard } from '../common/guards/permisos.guard';
 import { AuditoriaModule } from '../auditoria/auditoria.module';
+import { EndpointsController } from './controllers/endpoints.controller';
+import { StartupSeedService } from './services/startup-seed.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Usuario, Endpoint, Perfil, Permiso, Sesion]),
   ],
-  providers: [UsuarioService, RolesService, PermisosGuard, RolesService],
+  providers: [
+    UsuarioService,
+    RolesService,
+    PermisosGuard,
+    StartupSeedService,
+  ],
   exports: [UsuarioService, PermisosGuard, RolesService],
-  controllers: [PerfilController, UsuarioController],
+  controllers: [PerfilController, UsuarioController, EndpointsController],
 })
 export class UsuarioModule {}

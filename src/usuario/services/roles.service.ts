@@ -13,6 +13,7 @@ import { Usuario } from '../entities/usuario.entity';
 import { Sesion } from '../entities/sesion.entity';
 import { PerfilDto } from '../../auth/dto/perfil.dto';
 import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
+import { EndpointFlatResponseDto } from '../dto/endpoint.flat.response.dto';
 
 @Injectable()
 export class RolesService {
@@ -20,6 +21,8 @@ export class RolesService {
     private readonly dataSource: DataSource,
     @InjectRepository(Perfil)
     private readonly perfilesRepository: Repository<Perfil>,
+    @InjectRepository(Endpoint)
+    private readonly endpointsRepository: Repository<Endpoint>,
   ) {}
   async getFlatPermisosDePerfil(
     perfilId: number,
@@ -39,6 +42,16 @@ export class RolesService {
         endpoint?.descripcion ?? '',
       );
     });
+  }
+  async getFlatEndpoints(): Promise<EndpointFlatResponseDto[]> {
+    const endpoints = await this.endpointsRepository.find({
+      select: ['endpoint', 'descripcion'],
+      order: { endpoint: 'ASC' },
+    });
+    return endpoints.map(
+      (endpoint) =>
+        new EndpointFlatResponseDto(endpoint.endpoint, endpoint.descripcion),
+    );
   }
   async updatePerfil(
     id: number,

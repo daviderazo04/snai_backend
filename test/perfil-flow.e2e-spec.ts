@@ -199,5 +199,24 @@ describe('Flujo de perfil (e2e)', () => {
 
     expect([403, 404]).not.toContain(usuariosRes.status);
     expect(usuariosRes.status).toBe(200);
+
+    const endpointsRes = await request(app.getHttpServer())
+      .get('/endpoints')
+      .set('Authorization', `Bearer ${tokenConPerfilAdmin}`)
+      .expect(200);
+
+    const endpointsPlanos = endpointsRes.body as {
+      endpoint: string;
+      descripcion: string;
+    }[];
+    expect(endpointsPlanos).toHaveLength(endpointsCreados.length);
+    expect(
+      endpointsPlanos.map((e) => e.endpoint).sort(),
+    ).toEqual(endpointsCreados.map((e) => e.endpoint).sort());
+    endpointsPlanos.forEach((endpoint) => {
+      expect(endpoint.descripcion).toBe(
+        endpointsEsperados.get(endpoint.endpoint),
+      );
+    });
   });
 });
