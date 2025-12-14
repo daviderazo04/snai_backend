@@ -18,9 +18,18 @@ export class Ocupacion {
     description: 'Relación con adolescente',
     type: () => Adolescente,
   })
-  @JoinColumn({ name: 'adlc_id' })
+  @JoinColumn({ name: 'adlc__id' })
   @ManyToOne(() => Adolescente, (adolescente) => adolescente.ocupacion)
   adolescente: Adolescente;
+
+  @ApiProperty({
+    description: 'Fecha de la ocupación',
+    example: '2008-05-20',
+    type: String,
+    format: 'date',
+  })
+  @Column({ name: 'Fecha', type: 'date' })
+  fecha: Date;
 
   @ApiProperty({ description: 'Nombre del taller' })
   @Column({ name: 'Taller', length: 255 })

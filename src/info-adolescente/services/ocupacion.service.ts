@@ -75,7 +75,7 @@ export class OcupacionService {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       where,
       relations: ['adolescente'],
-      order: { taller: 'ASC' }, // Ordenar alfabéticamente por taller
+      order: { fecha: 'DESC' }, // Ordenar por fecha de la más actual a la más antigua
       take: size,
       skip: skip,
     });

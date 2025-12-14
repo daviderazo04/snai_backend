@@ -19,7 +19,7 @@ export class Juridico {
     description: 'Relación con adolescente',
     type: () => Adolescente,
   })
-  @JoinColumn({ name: 'adlc_id' })
+  @JoinColumn({ name: 'adlc__id' })
   @ManyToOne(() => Adolescente, (adolescente) => adolescente.juridico)
   adolescente: Adolescente;
 

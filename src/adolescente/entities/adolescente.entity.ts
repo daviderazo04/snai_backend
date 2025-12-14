@@ -15,6 +15,7 @@ import { Canton } from 'src/localidades/entities/canton.entity';
 import { RepInfractor } from './repInfractor.entity';
 import { Juridico } from 'src/info-adolescente/entities/juridico.entity';
 import { Ocupacion } from 'src/info-adolescente/entities/ocupacion.entity';
+import { Familia } from 'src/info-adolescente/entities/familia.entity';
 
 @Entity('adolescente')
 export class Adolescente {
@@ -46,6 +47,9 @@ export class Adolescente {
 
   @OneToMany(() => Ocupacion, (ocupacion) => ocupacion.adolescente)
   ocupacion: Ocupacion[];
+
+  @OneToMany(() => Familia, (familia) => familia.adolescente)
+  familia: Familia[];
 
   // Campos de la tabla
   @ApiProperty({ description: 'Nombre del adolescente', example: 'Juan' })
