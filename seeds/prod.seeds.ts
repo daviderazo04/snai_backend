@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { INestApplicationContext, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { DataSource, Repository } from 'typeorm';
@@ -180,10 +181,11 @@ async function ensureAdminUsuario(
   return deps.dataSource.getRepository(Usuario).create({ id: usuarioId });
 }
 
-async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule, {
-    logger: ['error', 'warn', 'log'],
-  });
+export async function runProdSeeds(
+  app: INestApplicationContext,
+  opts: { closeApp?: boolean } = {},
+) {
+  const logger = new Logger('ProdSeeds');
   try {
     const dataSource = app.get(DataSource);
     const deps: SeedDeps = {
@@ -204,12 +206,28 @@ async function bootstrap() {
     // eslint-disable-next-line no-console
     console.log('Seed de producción completado');
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error al ejecutar seeds de producción', error);
-    process.exitCode = 1;
+    logger.error('Error al ejecutar seeds de producción', error as Error);
+    throw error;
   } finally {
-    await app.close();
+    if (opts.closeApp) {
+      await app.close();
+    }
   }
 }
 
-void bootstrap();
+async function bootstrap() {
+  const app = await NestFactory.createApplicationContext(AppModule, {
+    logger: ['error', 'warn', 'log'],
+  });
+  try {
+    await runProdSeeds(app, { closeApp: true });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error al ejecutar seeds de producción', error);
+    process.exitCode = 1;
+  }
+}
+
+if (require.main === module) {
+  void bootstrap();
+}

@@ -5,6 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { DataSource } from 'typeorm';
 import { AuditoriaBeforeInterceptor } from './auditoria/interceptors/auditoria.before.interceptor';
 import { AuditoriaAfterInterceptor } from './auditoria/interceptors/auditoria.after.interceptor';
+import { runProdSeeds } from '../seeds/prod.seeds';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,13 @@ async function bootstrap() {
     logger.log('Migraciones aplicadas correctamente');
   } catch (err) {
     logger.error('Error al aplicar migraciones automáticamente', err as Error);
+  }
+
+  try {
+    await runProdSeeds(app);
+    logger.log('Seeds de producción ejecutados correctamente');
+  } catch (err) {
+    logger.error('Error al ejecutar seeds de producción', err as Error);
   }
 
   app.enableCors({ origin: '*' });
