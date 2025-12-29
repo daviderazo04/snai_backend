@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -23,7 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { ProvinciaPayloadDto } from '../dto/provincia.payload.dto';
 import { ProvinciaService } from '../services/provincia.service';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { Provincia } from '../entities/provincia.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -32,6 +33,8 @@ import * as AuditedRequest from '../../common/request/AuditedRequest';
 import { ProvinciaUpdatePayloadDto } from '../dto/provincia.update.payload.dto';
 import { AuditoriaService } from '../../auditoria/auditoria.service';
 import { Auditar } from '../../auditoria/decorators/auditar.decorator';
+import { Canton } from '../entities/canton.entity';
+import { PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('Provincias')
 @ApiExtraModels(ResultWithData, PaginatedResult, Provincia)
@@ -124,6 +127,42 @@ export class ProvinciasController {
     @Body() payload: ProvinciaUpdatePayloadDto,
     @Param('id') id: number,
   ): Promise<ResultWithData<Provincia>> {
-    return await this.provinciaService.updateProvincia(id, payload);
+    return await this.provinciaService.editProvincia(id, payload);
+  }
+  @Delete('/:id')
+  @ApiOkResponse({
+    description: 'Resultado de la operacion',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(Provincia)
+  @ApiOperation({
+    summary: 'Eliminar un Canton por id',
+    description: 'Elimina un Canton por su id',
+  })
+  async deleteProvincia(@Query('id') id: number): Promise<SimpleResult> {
+    return await this.provinciaService.softDeleteProvincia(id);
+  }
+
+  @Put('/:id')
+  @ApiOperation({ summary: 'Actualizar un canton por id' })
+  @ApiBody({ type: PutLocalidadesDto })
+  @ApiOkResponse({
+    description: 'Provincia actualizado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Provincia) },
+          },
+        },
+      ],
+    },
+  })
+  async updateCanton(
+    @Body() payload: PutLocalidadesDto,
+    @Param('id') id: number,
+  ): Promise<ResultWithData<Provincia>> {
+    return await this.provinciaService.editProvincia(id, payload);
   }
 }

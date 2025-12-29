@@ -10,6 +10,7 @@ import { Provincia } from './provincia.entity';
 import { Cai } from './cai.entity';
 import { Adolescente } from 'src/adolescente/entities/adolescente.entity';
 import { Representante } from 'src/adolescente/entities/representante.entity';
+import { Estado } from '../../common/enums/estado.enum';
 
 @Entity()
 export class Canton {
@@ -34,4 +35,10 @@ export class Canton {
 
   @OneToMany(() => Representante, (representante) => representante.canton)
   representantes: Canton[];
+  @Column({
+    type: 'enum',
+    enum: Estado,
+    default: Estado.ACTIVO,
+  })
+  estado: Estado;
 }

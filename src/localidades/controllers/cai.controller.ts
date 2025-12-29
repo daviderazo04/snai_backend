@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -14,11 +24,13 @@ import { CaiService } from '../services/cai.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { CaiPayloadDto } from '../dto/cai.payload.dto';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { Cai } from '../entities/cai.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Canton } from '../entities/canton.entity';
 import { Provincia } from '../entities/provincia.entity';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
+import { PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('CAI')
 @ApiExtraModels(ResultWithData, PaginatedResult, Cai, Canton, Provincia)
@@ -84,5 +96,42 @@ export class CaiController {
     @Query('size') size: number = 10,
   ) {
     return await this.caiService.getPaginatedCais(nombre, page, size);
+  }
+
+  @Delete('/:id')
+  @ApiOkResponse({
+    description: 'Resultado de la operacion',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(Cai)
+  @ApiOperation({
+    summary: 'Eliminar un CAI por id',
+    description: 'Elimina un CAI por su id',
+  })
+  async deleteCai(@Query('id') id: number): Promise<SimpleResult> {
+    return await this.caiService.softDeleteCai(id);
+  }
+
+  @Put('/:id')
+  @ApiOperation({ summary: 'Actualizar un CAI por id' })
+  @ApiBody({ type: PutLocalidadesDto })
+  @ApiOkResponse({
+    description: 'CAI actualizado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Cai) },
+          },
+        },
+      ],
+    },
+  })
+  async updateCai(
+    @Body() payload: PutLocalidadesDto,
+    @Param('id') id: number,
+  ): Promise<ResultWithData<Cai>> {
+    return await this.caiService.editCai(id, payload);
   }
 }

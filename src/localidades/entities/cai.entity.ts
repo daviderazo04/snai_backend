@@ -8,6 +8,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Canton } from './canton.entity';
 import { Adolescente } from 'src/adolescente/entities/adolescente.entity';
+import { Estado } from '../../common/enums/estado.enum';
 
 @Entity()
 export class Cai {
@@ -28,4 +29,10 @@ export class Cai {
 
   @OneToMany(() => Adolescente, (adolescente) => adolescente.cai)
   adolescentes: Adolescente[];
+  @Column({
+    type: 'enum',
+    enum: Estado,
+    default: Estado.ACTIVO,
+  })
+  estado: Estado;
 }

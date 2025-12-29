@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Canton } from './canton.entity';
+import { Estado } from '../../common/enums/estado.enum';
 @Entity()
 export class Provincia {
   @ApiProperty({ description: 'Identificador único de la provincia' })
@@ -19,4 +20,10 @@ export class Provincia {
   })
   @OneToMany(() => Canton, (canton) => canton.provincia)
   cantones: Canton[];
+  @Column({
+    type: 'enum',
+    enum: Estado,
+    default: Estado.ACTIVO,
+  })
+  estado: Estado;
 }

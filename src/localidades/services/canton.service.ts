@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ILike, Repository } from 'typeorm';
+import { Equal, ILike, Repository } from 'typeorm';
 import { Canton } from '../entities/canton.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Provincia } from '../entities/provincia.entity';
 import { CantonPayload } from '../dto/canton.payload.dto';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Estado } from '../../common/enums/estado.enum';
+import { PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @Injectable()
 export class CantonService {
@@ -16,6 +18,18 @@ export class CantonService {
     private readonly provinciaRepository: Repository<Provincia>,
   ) {}
 
+  async softDeleteCaton(id: number): Promise<SimpleResult> {
+    try {
+      const canton = await this.cantonRepository.findOneBy({ id: id });
+      if (!canton) throw new Error('Provincia no encontrada');
+      canton.estado = Estado.INACTIVO;
+      await this.cantonRepository.save(canton);
+      return new SimpleResult(true, 'Canton eliminado');
+    } catch (e) {
+      const err = e as Error;
+      return new SimpleResult(false, err.message);
+    }
+  }
   async createCanton(payload: CantonPayload): Promise<ResultWithData<Canton>> {
     try {
       const provincia = await this.provinciaRepository.findOneBy({
@@ -35,7 +49,25 @@ export class CantonService {
       return new ResultWithData<Canton>(false, err.message, null);
     }
   }
-
+  async editCanton(
+    id: number,
+    payload: PutLocalidadesDto,
+  ): Promise<ResultWithData<Canton>> {
+    try {
+      const canton = await this.cantonRepository.findOneBy({ id: id });
+      if (!canton) throw new Error('Provincia no encontrada');
+      canton.nombre = payload.nombre;
+      const savedCanton = await this.cantonRepository.save(canton);
+      return new ResultWithData<Canton>(
+        true,
+        'Provincia actualizada',
+        savedCanton,
+      );
+    } catch (e) {
+      const err = e as Error;
+      return new ResultWithData<Canton>(false, err.message, null);
+    }
+  }
   async getPaginatedCanton(
     nombre: string = '',
     page: number = 1,
@@ -47,12 +79,13 @@ export class CantonService {
         take: size,
         skip: skip,
         relations: ['provincia'],
+        where: { estado: Equal(Estado.ACTIVO) },
       });
       const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(perfiles, totalPages, page, size);
     } else {
       const [perfiles, totales] = await this.cantonRepository.findAndCount({
-        where: { nombre: ILike(`%${nombre}%`) },
+        where: { nombre: ILike(`%${nombre}%`), estado: Equal(Estado.ACTIVO) },
         take: size,
         skip: skip,
         relations: ['provincia'],

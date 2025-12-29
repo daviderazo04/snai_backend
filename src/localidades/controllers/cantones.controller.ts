@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -11,12 +21,15 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { CantonPayload } from '../dto/canton.payload.dto';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { Canton } from '../entities/canton.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { CantonService } from '../services/canton.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
+import { Cai } from '../entities/cai.entity';
+import { PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('Cantones')
 @ApiExtraModels(ResultWithData, PaginatedResult, Canton)
@@ -78,5 +91,42 @@ export class CantonesController {
     @Query('size') size: number = 10,
   ): Promise<PaginatedResult<Canton>> {
     return this.cantonService.getPaginatedCanton(nombre, page, size);
+  }
+
+  @Delete('/:id')
+  @ApiOkResponse({
+    description: 'Resultado de la operacion',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(Canton)
+  @ApiOperation({
+    summary: 'Eliminar un Canton por id',
+    description: 'Elimina un Canton por su id',
+  })
+  async deleteCanton(@Query('id') id: number): Promise<SimpleResult> {
+    return await this.cantonService.softDeleteCaton(id);
+  }
+
+  @Put('/:id')
+  @ApiOperation({ summary: 'Actualizar un canton por id' })
+  @ApiBody({ type: PutLocalidadesDto })
+  @ApiOkResponse({
+    description: 'Canton actualizado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Canton) },
+          },
+        },
+      ],
+    },
+  })
+  async updateCanton(
+    @Body() payload: PutLocalidadesDto,
+    @Param('id') id: number,
+  ): Promise<ResultWithData<Canton>> {
+    return await this.cantonService.editCanton(id, payload);
   }
 }
