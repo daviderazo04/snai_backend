@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -14,9 +24,11 @@ import { GdosService } from '../services/gdos.service';
 import { ParamPayload } from '../dto/param.payload';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Gdos } from '../entities/gdos';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
+import { Etnia } from '../entities/etnia.entity';
 
 @ApiTags('Gdos')
 @ApiExtraModels(ResultWithData, PaginatedResult, Gdos)
@@ -78,5 +90,36 @@ export class GdosController {
     @Query('size') size: number = 10,
   ): Promise<PaginatedResult<Gdos>> {
     return await this.gdosService.getPaginatedGdos(nombre, page, size);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Eliminar un  GDO',
+  })
+  @ApiOkResponse({
+    description: 'GDO eliminado correctamente',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(Gdos)
+  async deleteGdo(@Param('id') id: number): Promise<SimpleResult> {
+    return await this.gdosService.softDeleteGdos(id);
+  }
+  @Patch('/:id')
+  @ApiOperation({
+    summary: 'Editar un gdo',
+  })
+  @ApiOkResponse({
+    description: 'Gdo editado correctamente',
+    schema: {
+      $ref: getSchemaPath(ResultWithData),
+      properties: { data: { $ref: getSchemaPath(Gdos) } },
+    },
+  })
+  @Auditar(Gdos)
+  async updateGdo(
+    @Param('id') id: number,
+    @Body() payload: ParamPayload,
+  ): Promise<SimpleResult> {
+    return await this.gdosService.editGdos(id, payload);
   }
 }

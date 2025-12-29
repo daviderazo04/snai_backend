@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -98,16 +99,16 @@ export class CantonesController {
     description: 'Resultado de la operacion',
     schema: { $ref: getSchemaPath(SimpleResult) },
   })
-  @Auditar(Canton)
   @ApiOperation({
     summary: 'Eliminar un Canton por id',
     description: 'Elimina un Canton por su id',
   })
+  @Auditar(Canton)
   async deleteCanton(@Query('id') id: number): Promise<SimpleResult> {
     return await this.cantonService.softDeleteCaton(id);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Actualizar un canton por id' })
   @ApiBody({ type: PutLocalidadesDto })
   @ApiOkResponse({
@@ -123,6 +124,7 @@ export class CantonesController {
       ],
     },
   })
+  @Auditar(Canton)
   async updateCanton(
     @Body() payload: PutLocalidadesDto,
     @Param('id') id: number,

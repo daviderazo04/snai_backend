@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -103,16 +104,16 @@ export class CaiController {
     description: 'Resultado de la operacion',
     schema: { $ref: getSchemaPath(SimpleResult) },
   })
-  @Auditar(Cai)
   @ApiOperation({
     summary: 'Eliminar un CAI por id',
     description: 'Elimina un CAI por su id',
   })
+  @Auditar(Cai)
   async deleteCai(@Query('id') id: number): Promise<SimpleResult> {
     return await this.caiService.softDeleteCai(id);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Actualizar un CAI por id' })
   @ApiBody({ type: PutLocalidadesDto })
   @ApiOkResponse({
@@ -128,6 +129,7 @@ export class CaiController {
       ],
     },
   })
+  @Auditar(Cai)
   async updateCai(
     @Body() payload: PutLocalidadesDto,
     @Param('id') id: number,

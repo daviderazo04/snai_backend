@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -14,9 +24,11 @@ import { NacionalidadService } from '../services/nacionalidad.service';
 import { ParamPayload } from '../dto/param.payload';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Nacionalidad } from '../entities/nacionalidad.entity';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
+import { Gdos } from '../entities/gdos';
 
 @ApiTags('Nacionalidad')
 @ApiExtraModels(ResultWithData, PaginatedResult, Nacionalidad)
@@ -82,5 +94,36 @@ export class NacionalidadController {
       page,
       size,
     );
+  }
+
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Eliminar una nacionalidad',
+  })
+  @ApiOkResponse({
+    description: 'Nacionalidad eliminada correctamente',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(Nacionalidad)
+  async deleteNacionalidad(@Param('id') id: number): Promise<SimpleResult> {
+    return await this.nacionalidadService.softDeleteNacionalidad(id);
+  }
+  @Patch('/:id')
+  @ApiOperation({
+    summary: 'Editar una nacionalidad',
+  })
+  @ApiOkResponse({
+    description: 'Nacionalidad editada correctamente',
+    schema: {
+      $ref: getSchemaPath(ResultWithData),
+      properties: { data: { $ref: getSchemaPath(Nacionalidad) } },
+    },
+  })
+  @Auditar(Nacionalidad)
+  async updateGdo(
+    @Param('id') id: number,
+    @Body() payload: ParamPayload,
+  ): Promise<SimpleResult> {
+    return await this.nacionalidadService.editNacionalidad(id, payload);
   }
 }

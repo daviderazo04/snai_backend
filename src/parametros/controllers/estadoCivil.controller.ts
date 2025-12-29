@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -14,9 +25,10 @@ import { EstadoCivilService } from '../services/estadoCivil.service';
 import { ParamPayload } from '../dto/param.payload';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { EstadoCivil } from '../entities/estadoCivil';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Estado civil')
 @ApiExtraModels(ResultWithData, PaginatedResult, EstadoCivil)
@@ -82,5 +94,35 @@ export class EstadoCivilController {
       page,
       size,
     );
+  }
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Eliminar un estado civil',
+  })
+  @ApiOkResponse({
+    description: 'Estado civil eliminado correctamente',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(EstadoCivil)
+  async deleteEstadoCivil(@Param('id') id: number): Promise<SimpleResult> {
+    return await this.estadoCivilService.softDeleteEstadoCivil(id);
+  }
+  @Patch('/:id')
+  @ApiOperation({
+    summary: 'Editar un estado civil',
+  })
+  @ApiOkResponse({
+    description: 'Estado civil editado correctamente',
+    schema: {
+      $ref: getSchemaPath(ResultWithData),
+      properties: { data: { $ref: getSchemaPath(EstadoCivil) } },
+    },
+  })
+  @Auditar(EstadoCivil)
+  async updateEstadoCivil(
+    @Param('id') id: number,
+    @Body() payload: ParamPayload,
+  ): Promise<SimpleResult> {
+    return await this.estadoCivilService.editEstadoCivil(id, payload);
   }
 }

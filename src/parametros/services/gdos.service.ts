@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Gdos } from '../entities/gdos';
 import { ParamPayload } from '../dto/param.payload';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Estado } from '../../common/enums/estado.enum';
 
 @Injectable()
 export class GdosService {
@@ -44,5 +45,36 @@ export class GdosService {
       'Gdos creado exitosamente',
       savedGdos,
     );
+  }
+  async softDeleteGdos(id: number): Promise<SimpleResult> {
+    try {
+      const gdos = await this.gdosRepository.findOneBy({ id: id });
+      if (!gdos) throw new Error('No existe el gdos con el id ingresado');
+      gdos.estado = Estado.INACTIVO;
+      await this.gdosRepository.save(gdos);
+      return new SimpleResult(true, 'Gdos eliminado exitosamente');
+    } catch (e) {
+      const err = e as Error;
+      return new SimpleResult(false, err.message);
+    }
+  }
+  async editGdos(
+    id: number,
+    payload: ParamPayload,
+  ): Promise<ResultWithData<Gdos>> {
+    try {
+      const gdos = await this.gdosRepository.findOneBy({ id: id });
+      if (!gdos) throw new Error('No existe el gdos con el id ingresado');
+      gdos.nombre = payload.nombre;
+      const savedGdos = await this.gdosRepository.save(gdos);
+      return new ResultWithData<Gdos>(
+        true,
+        'Gdos editado exitosamente',
+        savedGdos,
+      );
+    } catch (e) {
+      const err = e as Error;
+      return new ResultWithData<Gdos>(false, err.message, null);
+    }
   }
 }

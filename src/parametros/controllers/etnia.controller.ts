@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -14,9 +24,11 @@ import { EtniaService } from '../services/etnia.service';
 import { ParamPayload } from '../dto/param.payload';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Etnia } from '../entities/etnia.entity';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
+import { EstadoCivil } from '../entities/estadoCivil';
 
 @ApiTags('Etnia')
 @ApiExtraModels(ResultWithData, PaginatedResult, Etnia)
@@ -78,5 +90,36 @@ export class EtniaController {
     @Query('size') size: number = 10,
   ): Promise<PaginatedResult<Etnia>> {
     return await this.etniaService.getPaginatedEtnia(nombre, page, size);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Eliminar un estado civil',
+  })
+  @ApiOkResponse({
+    description: 'Etnia eliminada correctamente',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  @Auditar(Etnia)
+  async deleteEtnia(@Param('id') id: number): Promise<SimpleResult> {
+    return await this.etniaService.softDeleteEtnia(id);
+  }
+  @Patch('/:id')
+  @ApiOperation({
+    summary: 'Editar una etnia',
+  })
+  @ApiOkResponse({
+    description: 'Estado civil editado correctamente',
+    schema: {
+      $ref: getSchemaPath(ResultWithData),
+      properties: { data: { $ref: getSchemaPath(Etnia) } },
+    },
+  })
+  @Auditar(Etnia)
+  async updateEtnia(
+    @Param('id') id: number,
+    @Body() payload: ParamPayload,
+  ): Promise<SimpleResult> {
+    return await this.etniaService.editEtnia(id, payload);
   }
 }

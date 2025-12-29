@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Nacionalidad } from '../entities/nacionalidad.entity';
 import { ParamPayload } from '../dto/param.payload';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Estado } from '../../common/enums/estado.enum';
 
 @Injectable()
 export class NacionalidadService {
@@ -49,5 +50,43 @@ export class NacionalidadService {
       'Nacionalidad creada exitosamente',
       savedNacionalidad,
     );
+  }
+  async softDeleteNacionalidad(id: number): Promise<SimpleResult> {
+    try {
+      const nacionalidad = await this.nacionalidadRepository.findOneBy({
+        id: id,
+      });
+      if (!nacionalidad)
+        throw new Error('No existe la nacionalidad con el id ingresado');
+      nacionalidad.estado = Estado.INACTIVO;
+      await this.nacionalidadRepository.save(nacionalidad);
+      return new SimpleResult(true, 'Nacionalidad eliminada exitosamente');
+    } catch (e) {
+      const err = e as Error;
+      return new SimpleResult(false, err.message);
+    }
+  }
+  async editNacionalidad(
+    id: number,
+    payload: ParamPayload,
+  ): Promise<ResultWithData<Nacionalidad>> {
+    try {
+      const nacionalidad = await this.nacionalidadRepository.findOneBy({
+        id: id,
+      });
+      if (!nacionalidad)
+        throw new Error('No existe la nacionalidad con el id ingresado');
+      nacionalidad.nombre = payload.nombre;
+      const savedNacionalidad =
+        await this.nacionalidadRepository.save(nacionalidad);
+      return new ResultWithData<Nacionalidad>(
+        true,
+        'Nacionalidad editada exitosamente',
+        savedNacionalidad,
+      );
+    } catch (e) {
+      const err = e as Error;
+      return new ResultWithData<Nacionalidad>(false, err.message, null);
+    }
   }
 }
