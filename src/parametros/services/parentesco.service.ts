@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { Parentesco } from '../entities/parentesco.entity';
 import { ParamPayload } from '../dto/param.payload';
 import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
@@ -23,13 +23,14 @@ export class ParentescoService {
         await this.parentescoRepository.findAndCount({
           take: size,
           skip: (page - 1) * size,
+          where: { estado: Equal(Estado.ACTIVO) },
         });
       const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(parentescos, totalPages, page, size);
     } else {
       const [parentescos, totales] =
         await this.parentescoRepository.findAndCount({
-          where: { nombre: nombre },
+          where: { nombre: nombre, estado: Equal(Estado.ACTIVO) },
           take: size,
           skip: (page - 1) * size,
         });

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { Gdos } from '../entities/gdos';
 import { ParamPayload } from '../dto/param.payload';
 import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
@@ -22,12 +22,13 @@ export class GdosService {
       const [gdos, totales] = await this.gdosRepository.findAndCount({
         take: size,
         skip: (page - 1) * size,
+        where: { estado: Equal(Estado.ACTIVO) },
       });
       const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(gdos, totalPages, page, size);
     } else {
       const [gdos, totales] = await this.gdosRepository.findAndCount({
-        where: { nombre: nombre },
+        where: { nombre: nombre, estado: Equal(Estado.ACTIVO) },
         take: size,
         skip: (page - 1) * size,
       });

@@ -23,7 +23,7 @@ export class EstadoCivilService {
         await this.estadoCivilRepository.findAndCount({
           take: size,
           skip: (page - 1) * size,
-          where: { estado: Equal(Estado.INACTIVO) },
+          where: { estado: Equal(Estado.ACTIVO) },
         });
       const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(estadoCivils, totalPages, page, size);
@@ -32,7 +32,7 @@ export class EstadoCivilService {
         await this.estadoCivilRepository.findAndCount({
           where: {
             nombre: Like(`%${nombre}%`),
-            estado: Equal(Estado.INACTIVO),
+            estado: Equal(Estado.ACTIVO),
           },
           take: size,
           skip: (page - 1) * size,
