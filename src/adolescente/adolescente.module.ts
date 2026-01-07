@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CommonModule } from '../common/common.module';
 import { UsuarioModule } from '../usuario/usuario.module';
 import { Adolescente } from './entities/adolescente.entity';
 import { AdolescenteService } from './services/adolescente.service';

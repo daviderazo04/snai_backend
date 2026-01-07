@@ -19,12 +19,7 @@ import { StartupSeedService } from './services/startup-seed.service';
   imports: [
     TypeOrmModule.forFeature([Usuario, Endpoint, Perfil, Permiso, Sesion]),
   ],
-  providers: [
-    UsuarioService,
-    RolesService,
-    PermisosGuard,
-    StartupSeedService,
-  ],
+  providers: [UsuarioService, RolesService, PermisosGuard, StartupSeedService],
   exports: [UsuarioService, PermisosGuard, RolesService],
   controllers: [PerfilController, UsuarioController, EndpointsController],
 })

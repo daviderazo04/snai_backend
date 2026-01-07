@@ -241,7 +241,9 @@ export class AdolescenteService {
 
   async softDeleteAdolescente(id: number): Promise<SimpleResult> {
     try {
-      const adolescente = await this.adolescenteRepository.findOneBy({ id: id });
+      const adolescente = await this.adolescenteRepository.findOneBy({
+        id: id,
+      });
       if (!adolescente)
         return new SimpleResult(
           false,

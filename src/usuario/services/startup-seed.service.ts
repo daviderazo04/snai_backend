@@ -117,11 +117,14 @@ export class StartupSeedService implements OnApplicationBootstrap {
   }
 
   private async ensureAdminUsuario(perfil: Perfil): Promise<Usuario> {
-    const cedula = this.configService.get<string>('SEED_ADMIN_CEDULA') ?? '1717171717';
-    const correo = this.configService.get<string>('SEED_ADMIN_EMAIL') ?? 'admin@snai.local';
+    const cedula =
+      this.configService.get<string>('SEED_ADMIN_CEDULA') ?? '1717171717';
+    const correo =
+      this.configService.get<string>('SEED_ADMIN_EMAIL') ?? 'admin@snai.local';
     const password =
       this.configService.get<string>('SEED_ADMIN_PASSWORD') ?? 'Admin123!';
-    const nombre = this.configService.get<string>('SEED_ADMIN_NOMBRE') ?? 'Admin';
+    const nombre =
+      this.configService.get<string>('SEED_ADMIN_NOMBRE') ?? 'Admin';
     const apellido =
       this.configService.get<string>('SEED_ADMIN_APELLIDO') ?? 'SNIA';
 

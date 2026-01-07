@@ -45,14 +45,10 @@ export class AuditoriaAfterInterceptor implements NestInterceptor {
                 message,
               );
             } else {
-              await this.auditoriaService.completeAuditoria(
-                auditoriaId,
-                true,
-              );
+              await this.auditoriaService.completeAuditoria(auditoriaId, true);
             }
           }
         } catch (err) {
-          // eslint-disable-next-line no-console
           console.error(err);
         }
       }),

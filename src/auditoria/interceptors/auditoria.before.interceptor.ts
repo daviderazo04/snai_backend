@@ -30,7 +30,7 @@ export class AuditoriaBeforeInterceptor implements NestInterceptor {
           .captureBeforeState(auditoriaId!, entity, idEntidad)
           .catch((err) => {
             // No interrumpir la petición si la auditoría falla
-            // eslint-disable-next-line no-console
+
             console.error(err);
           })
       : Promise.resolve();

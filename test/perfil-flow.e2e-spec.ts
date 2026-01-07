@@ -210,9 +210,9 @@ describe('Flujo de perfil (e2e)', () => {
       descripcion: string;
     }[];
     expect(endpointsPlanos).toHaveLength(endpointsCreados.length);
-    expect(
-      endpointsPlanos.map((e) => e.endpoint).sort(),
-    ).toEqual(endpointsCreados.map((e) => e.endpoint).sort());
+    expect(endpointsPlanos.map((e) => e.endpoint).sort()).toEqual(
+      endpointsCreados.map((e) => e.endpoint).sort(),
+    );
     endpointsPlanos.forEach((endpoint) => {
       expect(endpoint.descripcion).toBe(
         endpointsEsperados.get(endpoint.endpoint),
