@@ -16,6 +16,7 @@ import { RepInfractor } from './repInfractor.entity';
 import { Juridico } from 'src/info-adolescente/entities/juridico.entity';
 import { Ocupacion } from 'src/info-adolescente/entities/ocupacion.entity';
 import { Familia } from 'src/info-adolescente/entities/familia.entity';
+import { Estado } from 'src/common/enums/estado.enum';
 
 @Entity('adolescente')
 export class Adolescente {
@@ -111,6 +112,13 @@ export class Adolescente {
   })
   @Column({ length: 255 })
   observaciones: string;
+
+  @Column({
+    type: 'enum',
+    enum: Estado,
+    default: Estado.ACTIVO,
+  })
+  estado: Estado;
 
   // Un adolescente puede estar en múltiples registros de  repInfractor(tener uno o varios representantes)
   @OneToMany(() => RepInfractor, (repInfractor) => repInfractor.representante)

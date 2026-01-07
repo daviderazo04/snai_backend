@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -11,7 +21,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { AdolescentePayloadDto } from '../dto/adolescente.payload.dto';
-import { ResultWithData } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { Adolescente } from '../entities/adolescente.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -19,7 +29,7 @@ import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { AdolescenteService } from '../services/adolescente.service';
 
 @ApiTags('Adolescentes')
-@ApiExtraModels(ResultWithData, PaginatedResult, Adolescente)
+@ApiExtraModels(ResultWithData, SimpleResult, PaginatedResult, Adolescente)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('adolescentes')
 export class AdolescentesController {
@@ -80,5 +90,42 @@ export class AdolescentesController {
     @Query('size') size: number = 10,
   ): Promise<PaginatedResult<Adolescente>> {
     return this.adolescenteService.getAdolescentes(nombre, cedula, page, size);
+  }
+
+  @Put('/:id')
+  @ApiOperation({ summary: 'Actualizar un adolescente por id' })
+  @ApiBody({ type: AdolescentePayloadDto })
+  @ApiOkResponse({
+    description: 'Adolescente actualizado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Adolescente) },
+          },
+        },
+      ],
+    },
+  })
+  @ApiBadRequestResponse({
+    description:
+      'El payload no cumple las validaciones o algún campo de adolescente no está bien especificado',
+  })
+  async updateAdolescente(
+    @Param('id') id: number,
+    @Body() payload: AdolescentePayloadDto,
+  ): Promise<ResultWithData<Adolescente>> {
+    return this.adolescenteService.updateAdolescente(id, payload);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({ summary: 'Eliminar un adolescente por id' })
+  @ApiOkResponse({
+    description: 'Resultado de la operacion',
+    schema: { $ref: getSchemaPath(SimpleResult) },
+  })
+  async deleteAdolescente(@Param('id') id: number): Promise<SimpleResult> {
+    return this.adolescenteService.softDeleteAdolescente(id);
   }
 }
