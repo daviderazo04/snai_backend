@@ -17,6 +17,8 @@ import { Juridico } from 'src/info-adolescente/entities/juridico.entity';
 import { Ocupacion } from 'src/info-adolescente/entities/ocupacion.entity';
 import { Familia } from 'src/info-adolescente/entities/familia.entity';
 import { Estado } from 'src/common/enums/estado.enum';
+import { Salud } from '../../info-adolescente/entities/salud.entity';
+import { Educa } from '../../info-adolescente/entities/educa.entity';
 
 @Entity('adolescente')
 export class Adolescente {
@@ -123,4 +125,10 @@ export class Adolescente {
   // Un adolescente puede estar en múltiples registros de  repInfractor(tener uno o varios representantes)
   @OneToMany(() => RepInfractor, (repInfractor) => repInfractor.representante)
   repInfractores: RepInfractor[];
+
+  @OneToMany(() => Salud, (salud) => salud.adolescente)
+  salud: Salud[];
+
+  @OneToMany(() => Educa, (educa) => educa.adolescente)
+  educa: Educa[];
 }
