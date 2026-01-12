@@ -56,6 +56,10 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
   { endpoint: '/delito/:id', descripcion: 'Detalle de delito' },
   { endpoint: '/juridico', descripcion: 'Registro juridico de adolescentes' },
   { endpoint: '/juridico/:id', descripcion: 'Detalle juridico especifico' },
+  { endpoint: '/salud', descripcion: 'Registro de salud de adolescentes' },
+  { endpoint: '/educacion', descripcion: 'Registro educativo de adolescentes' },
+  { endpoint: '/evento', descripcion: 'Catalogo de eventos' },
+  { endpoint: '/familia', descripcion: 'Registro de interaccion familiar' },
 ] as const;
 
 export type EndpointPath = (typeof ALL_ENDPOINTS)[number]['endpoint'];

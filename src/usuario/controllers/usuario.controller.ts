@@ -30,7 +30,7 @@ export class UsuarioController {
     private readonly userService: UsuarioService,
     private readonly rolesService: RolesService,
   ) {}
-  @Post('/perfil')
+  @Post('/perfil/:id')
   @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
   @ApiBody({ type: PerfilAsignarPayload })
   @ApiOkResponse({
