@@ -103,33 +103,7 @@ export class ProvinciasController {
   ): Promise<PaginatedResult<Provincia>> {
     return this.provinciaService.getPaginatedProvincia(nombre, page, size);
   }
-  @Auditar(Provincia)
-  @Put('/:id')
-  @ApiOperation({ summary: 'Actualizar una provincia por id' })
-  @ApiBody({ type: ProvinciaUpdatePayloadDto })
-  @ApiOkResponse({
-    description: 'Provincia actualizada correctamente',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResultWithData) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(Provincia) },
-          },
-        },
-      ],
-    },
-  })
-  @ApiBadRequestResponse({
-    description:
-      'El payload no cumple las validaciones o la provincia no existe',
-  })
-  async updateProvincia(
-    @Body() payload: ProvinciaUpdatePayloadDto,
-    @Param('id') id: number,
-  ): Promise<ResultWithData<Provincia>> {
-    return await this.provinciaService.editProvincia(id, payload);
-  }
+
   @Delete('/:id')
   @ApiOkResponse({
     description: 'Resultado de la operacion',
@@ -160,7 +134,7 @@ export class ProvinciasController {
     },
   })
   @Auditar(Provincia)
-  async updateCanton(
+  async updateProvincia(
     @Body() payload: PutLocalidadesDto,
     @Param('id') id: number,
   ): Promise<ResultWithData<Provincia>> {

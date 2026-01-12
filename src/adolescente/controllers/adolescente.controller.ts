@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -92,7 +93,7 @@ export class AdolescentesController {
     return this.adolescenteService.getAdolescentes(nombre, cedula, page, size);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Actualizar un adolescente por id' })
   @ApiBody({ type: AdolescentePayloadDto })
   @ApiOkResponse({

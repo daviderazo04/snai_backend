@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -81,7 +82,7 @@ export class SaludController {
     return this.saludService.getSaludPaginado(page, size);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Actualizar registro de salud por id' })
   @ApiBody({ type: SaludPayloadDto })
   @ApiOkResponse({

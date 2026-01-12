@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -81,7 +82,7 @@ export class EducaController {
     return this.educaService.getEducaPaginado(page, size);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Actualizar registro educativo por id' })
   @ApiBody({ type: EducaPayloadDto })
   @ApiOkResponse({

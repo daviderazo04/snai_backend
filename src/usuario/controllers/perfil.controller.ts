@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -57,7 +58,7 @@ export class PerfilController {
   ): Promise<ResultWithData<Perfil>> {
     return await this.roleService.createPerfil(payload);
   }
-  @Put('/:id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Editar perfil de usuario' })
   @ApiExtraModels(ResultWithData, Perfil)
   @ApiBody({ type: PerfilUpdatePayloadDto })
