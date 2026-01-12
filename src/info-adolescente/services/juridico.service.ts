@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Juridico } from '../entities/juridico.entity';
@@ -27,8 +27,10 @@ export class JuridicoService {
       id: createJuridicoDto.adolescenteId,
     });
     if (!adolescente) {
-      throw new NotFoundException(
+      return new ResultWithData<Juridico>(
+        false,
         `No se encontró el Adolescente con ID ${createJuridicoDto.adolescenteId}`,
+        null,
       );
     }
 
@@ -37,8 +39,10 @@ export class JuridicoService {
       id: createJuridicoDto.delitoId,
     });
     if (!delito) {
-      throw new NotFoundException(
+      return new ResultWithData<Juridico>(
+        false,
         `No se encontró el Delito con ID ${createJuridicoDto.delitoId}`,
+        null,
       );
     }
 
@@ -112,8 +116,10 @@ export class JuridicoService {
     });
 
     if (!juridico) {
-      throw new NotFoundException(
+      return new ResultWithData<Juridico>(
+        false,
         `El registro jurídico con ID ${id} no fue encontrado`,
+        null,
       );
     }
 
@@ -126,13 +132,15 @@ export class JuridicoService {
 
   async update(
     id: number,
-    updateJuridicoDto: Partial<CreateJuridicoDto>,
+    updateJuridicoDto: CreateJuridicoDto,
   ): Promise<ResultWithData<Juridico>> {
     // 1. Buscar el registro existente
     const juridico = await this.juridicoRepository.findOneBy({ id });
     if (!juridico) {
-      throw new NotFoundException(
+      return new ResultWithData<Juridico>(
+        false,
         `El registro jurídico con ID ${id} no fue encontrado`,
+        null,
       );
     }
 
@@ -142,8 +150,10 @@ export class JuridicoService {
         id: updateJuridicoDto.adolescenteId,
       });
       if (!adolescente) {
-        throw new NotFoundException(
+        return new ResultWithData<Juridico>(
+          false,
           `No se encontró el Adolescente con ID ${updateJuridicoDto.adolescenteId}`,
+          null,
         );
       }
       juridico.adolescente = adolescente;
@@ -154,8 +164,10 @@ export class JuridicoService {
         id: updateJuridicoDto.delitoId,
       });
       if (!delito) {
-        throw new NotFoundException(
+        return new ResultWithData<Juridico>(
+          false,
           `No se encontró el Delito con ID ${updateJuridicoDto.delitoId}`,
+          null,
         );
       }
       juridico.delito = delito;

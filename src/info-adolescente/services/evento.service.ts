@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Evento } from '../entities/evento.entity'; // Asegúrate de la ruta
@@ -24,8 +20,10 @@ export class EventoService {
     });
 
     if (existe) {
-      throw new ConflictException(
-        `El evento '${eventoDto.nombre}' ya existe en la base de datos.`,
+      return new ResultWithData<Evento>(
+        false,
+        `El evento ${eventoDto.nombre} ya existe en la base de datos.`,
+        null,
       );
     }
 
@@ -76,7 +74,11 @@ export class EventoService {
     const evento = await this.eventoRepository.findOneBy({ id });
 
     if (!evento) {
-      throw new NotFoundException(`El evento con ID ${id} no fue encontrado`);
+      return new ResultWithData<Evento>(
+        false,
+        `El evento con ID ${id} no fue encontrado`,
+        null,
+      );
     }
 
     return new ResultWithData<Evento>(
@@ -88,12 +90,16 @@ export class EventoService {
 
   async update(
     id: number,
-    updateEventoDto: Partial<EventoDto>,
+    updateEventoDto: EventoDto,
   ): Promise<ResultWithData<Evento>> {
     // 1. Buscar existente
     const evento = await this.eventoRepository.findOneBy({ id });
     if (!evento) {
-      throw new NotFoundException(`El evento con ID ${id} no fue encontrado`);
+      return new ResultWithData<Evento>(
+        false,
+        `El evento con ID ${id} no fue encontrado`,
+        null,
+      );
     }
 
     // 2. Validar nombre duplicado si se intenta cambiar
@@ -105,8 +111,10 @@ export class EventoService {
         descripcion: updateEventoDto.nombre,
       });
       if (existeNombre) {
-        throw new ConflictException(
+        return new ResultWithData<Evento>(
+          false,
           `Ya existe otro evento llamado '${updateEventoDto.nombre}'`,
+          null,
         );
       }
       // Actualizamos el campo descripcion con el nuevo nombre
@@ -128,7 +136,11 @@ export class EventoService {
   async remove(id: number): Promise<ResultWithData<boolean>> {
     const evento = await this.eventoRepository.findOneBy({ id });
     if (!evento) {
-      throw new NotFoundException(`El evento con ID ${id} no fue encontrado`);
+      return new ResultWithData<boolean>(
+        false,
+        `El evento con ID ${id} no fue encontrado`,
+        null,
+      );
     }
 
     await this.eventoRepository.remove(evento);

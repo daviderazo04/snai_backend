@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Familia } from '../entities/familia.entity';
@@ -25,8 +25,10 @@ export class FamiliaService {
       id: familiaDto.adolescenteId,
     });
     if (!adolescente) {
-      throw new NotFoundException(
+      return new ResultWithData<Familia>(
+        true,
         `No se encontró el Adolescente con ID ${familiaDto.adolescenteId}`,
+        null,
       );
     }
 
@@ -35,8 +37,10 @@ export class FamiliaService {
       id: familiaDto.eventoId,
     });
     if (!evento) {
-      throw new NotFoundException(
+      return new ResultWithData<Familia>(
+        true,
         `No se encontró el Evento con ID ${familiaDto.eventoId}`,
+        null,
       );
     }
 
@@ -110,8 +114,10 @@ export class FamiliaService {
     });
 
     if (!familia) {
-      throw new NotFoundException(
+      return new ResultWithData<Familia>(
+        true,
         `El registro familiar con ID ${id} no fue encontrado`,
+        null,
       );
     }
 
@@ -124,13 +130,15 @@ export class FamiliaService {
 
   async update(
     id: number,
-    updateFamiliaDto: Partial<FamiliaDto>,
+    updateFamiliaDto: FamiliaDto,
   ): Promise<ResultWithData<Familia>> {
     // 1. Buscar registro existente
     const familia = await this.familiaRepository.findOneBy({ id });
     if (!familia) {
-      throw new NotFoundException(
+      return new ResultWithData<Familia>(
+        true,
         `El registro familiar con ID ${id} no fue encontrado`,
+        null,
       );
     }
 
@@ -140,8 +148,10 @@ export class FamiliaService {
         id: updateFamiliaDto.adolescenteId,
       });
       if (!adolescente) {
-        throw new NotFoundException(
+        return new ResultWithData<Familia>(
+          true,
           `No se encontró el Adolescente con ID ${updateFamiliaDto.adolescenteId}`,
+          null,
         );
       }
       familia.adolescente = adolescente;
@@ -152,8 +162,10 @@ export class FamiliaService {
         id: updateFamiliaDto.eventoId,
       });
       if (!evento) {
-        throw new NotFoundException(
+        return new ResultWithData<Familia>(
+          true,
           `No se encontró el Evento con ID ${updateFamiliaDto.eventoId}`,
+          null,
         );
       }
       familia.evento = evento;
@@ -178,8 +190,10 @@ export class FamiliaService {
   async remove(id: number): Promise<ResultWithData<boolean>> {
     const familia = await this.familiaRepository.findOneBy({ id });
     if (!familia) {
-      throw new NotFoundException(
+      return new ResultWithData<boolean>(
+        true,
         `El registro familiar con ID ${id} no fue encontrado`,
+        null,
       );
     }
 

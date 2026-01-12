@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
+  Put,
   Post,
   Query,
   UseGuards,
@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Familia')
 @ApiExtraModels(ResultWithData, PaginatedResult, Familia)
@@ -60,6 +61,7 @@ export class FamiliaController {
     description:
       'El payload no cumple las validaciones o los IDs relacionados no existen',
   })
+  @Auditar(Familia)
   async create(@Body() createFamiliaDto: FamiliaDto) {
     return await this.familiaService.create(createFamiliaDto);
   }
@@ -145,7 +147,7 @@ export class FamiliaController {
     return await this.familiaService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({
     summary: 'Actualizar un registro de Familia',
     description: 'Actualiza los datos de una interacción familiar existente.',
@@ -164,6 +166,7 @@ export class FamiliaController {
       ],
     },
   })
+  @Auditar(Familia)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateFamiliaDto: FamiliaDto, // Usamos el mismo DTO
@@ -189,6 +192,7 @@ export class FamiliaController {
       ],
     },
   })
+  @Auditar(Familia)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.familiaService.remove(id);
   }

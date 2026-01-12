@@ -5,8 +5,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Evento')
 @ApiExtraModels(ResultWithData, PaginatedResult, Evento)
@@ -58,6 +59,7 @@ export class EventoController {
   @ApiBadRequestResponse({
     description: 'El payload no cumple las validaciones o el evento ya existe',
   })
+  @Auditar(Evento)
   async create(@Body() createEventoDto: EventoDto) {
     return await this.eventoService.create(createEventoDto);
   }
@@ -118,7 +120,7 @@ export class EventoController {
     return await this.eventoService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({
     summary: 'Actualizar un Evento',
     description: 'Actualiza el nombre de un evento existente.',
@@ -137,6 +139,7 @@ export class EventoController {
       ],
     },
   })
+  @Auditar(Evento)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEventoDto: EventoDto,
@@ -162,6 +165,7 @@ export class EventoController {
       ],
     },
   })
+  @Auditar(Evento)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.eventoService.remove(id);
   }

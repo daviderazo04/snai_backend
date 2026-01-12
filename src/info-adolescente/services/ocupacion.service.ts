@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Ocupacion } from '../entities/ocupacion.entity'; // Asegúrate de que la entidad se llame así
@@ -23,8 +23,10 @@ export class OcupacionService {
       id: createOcupacionDto.adolescenteId,
     });
     if (!adolescente) {
-      throw new NotFoundException(
+      return new ResultWithData<Ocupacion>(
+        false,
         `No se encontró el Adolescente con ID ${createOcupacionDto.adolescenteId}`,
+        null,
       );
     }
 
@@ -42,7 +44,7 @@ export class OcupacionService {
       await this.ocupacionRepository.save(nuevaOcupacion);
 
     return new ResultWithData<Ocupacion>(
-      true,
+      false,
       'Registro de ocupación creado exitosamente',
       ocupacionGuardada,
     );
@@ -91,8 +93,10 @@ export class OcupacionService {
     });
 
     if (!ocupacion) {
-      throw new NotFoundException(
+      return new ResultWithData<Ocupacion>(
+        false,
         `El registro de ocupación con ID ${id} no fue encontrado`,
+        null,
       );
     }
 
@@ -105,13 +109,15 @@ export class OcupacionService {
 
   async update(
     id: number,
-    updateOcupacionDto: Partial<CreateOcupacionDto>,
+    updateOcupacionDto: CreateOcupacionDto,
   ): Promise<ResultWithData<Ocupacion>> {
     // 1. Buscar el registro existente
     const ocupacion = await this.ocupacionRepository.findOneBy({ id });
     if (!ocupacion) {
-      throw new NotFoundException(
+      return new ResultWithData<Ocupacion>(
+        false,
         `El registro de ocupación con ID ${id} no fue encontrado`,
+        null,
       );
     }
 
@@ -121,8 +127,10 @@ export class OcupacionService {
         id: updateOcupacionDto.adolescenteId,
       });
       if (!adolescente) {
-        throw new NotFoundException(
+        return new ResultWithData<Ocupacion>(
+          false,
           `No se encontró el Adolescente con ID ${updateOcupacionDto.adolescenteId}`,
+          null,
         );
       }
       ocupacion.adolescente = adolescente;

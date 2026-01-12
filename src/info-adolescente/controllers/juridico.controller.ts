@@ -4,8 +4,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
+  Put,
   Query,
   UseGuards,
   // Delete, // Comentado según servicio
@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Jurídico')
 @ApiExtraModels(ResultWithData, PaginatedResult, Juridico)
@@ -60,6 +61,7 @@ export class JuridicoController {
     description:
       'El payload no cumple las validaciones o los IDs relacionados no existen',
   })
+  @Auditar(Juridico)
   async create(@Body() createJuridicoDto: CreateJuridicoDto) {
     return await this.juridicoService.create(createJuridicoDto);
   }
@@ -145,7 +147,7 @@ export class JuridicoController {
     return await this.juridicoService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({
     summary: 'Actualizar un registro Jurídico',
     description: 'Actualiza los datos de un proceso jurídico existente.',
@@ -164,6 +166,7 @@ export class JuridicoController {
       ],
     },
   })
+  @Auditar(Juridico)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateJuridicoDto: CreateJuridicoDto, // Usamos el mismo DTO como base

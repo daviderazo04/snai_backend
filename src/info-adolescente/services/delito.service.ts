@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Delito } from '../entities/delito.entity';
@@ -23,10 +19,12 @@ export class DelitoService {
       nombre: delitoDto.nombre,
     });
 
-    // 2. Si existe, lanzamos un error 409 (Conflict)
+    // 2. Si existe, retornamos FALSE y NULL en la data
     if (existe) {
-      throw new ConflictException(
-        `El delito '${delitoDto.nombre}' ya existe en la base de datos.`,
+      return new ResultWithData<Delito>(
+        false, // success: false
+        `El delito '${delitoDto.nombre}' ya existe en la base de datos.`, // message
+        null, // data: null (porque no se creó nada)
       );
     }
 
@@ -74,7 +72,11 @@ export class DelitoService {
   async findOne(id: number): Promise<ResultWithData<Delito>> {
     const delito = await this.delitoRepository.findOneBy({ id });
     if (!delito) {
-      throw new NotFoundException(`El delito con ID ${id} no fue encontrado`);
+      return new ResultWithData<Delito>(
+        false, // success: false
+        `El delito con ID ${id} no fue encontrado`, // message
+        null, // data: null
+      );
     }
     return new ResultWithData<Delito>(
       true,
@@ -85,11 +87,15 @@ export class DelitoService {
 
   async update(
     id: number,
-    updateDelitoDto: Partial<DelitoDto>,
+    updateDelitoDto: DelitoDto,
   ): Promise<ResultWithData<Delito>> {
     const delito = await this.delitoRepository.findOneBy({ id });
     if (!delito) {
-      throw new NotFoundException(`El delito con ID ${id} no fue encontrado`);
+      return new ResultWithData<Delito>(
+        false, // success: false
+        `El delito con ID ${id} no fue encontrado`, // message
+        null, // data: null
+      );
     }
 
     // Si cambian el nombre, verificar que no choque con otro existente
@@ -98,8 +104,10 @@ export class DelitoService {
         nombre: updateDelitoDto.nombre,
       });
       if (existeNombre) {
-        throw new ConflictException(
-          `Ya existe otro delito llamado '${updateDelitoDto.nombre}'`,
+        return new ResultWithData<Delito>(
+          false, // success: false
+          `Ya existe otro delito llamado '${updateDelitoDto.nombre}'`, // message
+          null, // data: null
         );
       }
     }
@@ -118,7 +126,11 @@ export class DelitoService {
   async remove(id: number): Promise<ResultWithData<boolean>> {
     const delito = await this.delitoRepository.findOneBy({ id });
     if (!delito) {
-      throw new NotFoundException(`El delito con ID ${id} no fue encontrado`);
+      return new ResultWithData<boolean>(
+        false, // success: false
+        `El delito con ID ${id} no fue encontrado`, // message
+        false, // data: false
+      );
     }
 
     await this.delitoRepository.remove(delito);

@@ -4,7 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
+  Put,
   Post,
   Query,
   UseGuards,
@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Ocupación')
 @ApiExtraModels(ResultWithData, PaginatedResult, Ocupacion)
@@ -59,6 +60,7 @@ export class OcupacionController {
     description:
       'El payload no cumple las validaciones o el adolescente no existe',
   })
+  @Auditar(Ocupacion)
   async create(@Body() createOcupacionDto: CreateOcupacionDto) {
     return await this.ocupacionService.create(createOcupacionDto);
   }
@@ -136,7 +138,7 @@ export class OcupacionController {
     return await this.ocupacionService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({
     summary: 'Actualizar una Ocupación',
     description: 'Actualiza los datos de una ocupación existente.',
@@ -155,6 +157,7 @@ export class OcupacionController {
       ],
     },
   })
+  @Auditar(Ocupacion)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOcupacionDto: CreateOcupacionDto, // Usamos el mismo DTO como base

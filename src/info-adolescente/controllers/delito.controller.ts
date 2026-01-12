@@ -4,11 +4,11 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   ParseIntPipe,
   Post,
   Query,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
+import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Delito')
 @ApiExtraModels(ResultWithData, PaginatedResult, Delito)
@@ -58,6 +59,7 @@ export class DelitoController {
   @ApiBadRequestResponse({
     description: 'El payload no cumple las validaciones o el delito ya existe',
   })
+  @Auditar(Delito)
   async create(@Body() createDelitoDto: DelitoDto) {
     return await this.delitoService.create(createDelitoDto);
   }
@@ -117,7 +119,7 @@ export class DelitoController {
     return await this.delitoService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({
     summary: 'Actualizar un Delito',
     description: 'Actualiza los datos de un delito existente.',
@@ -136,6 +138,7 @@ export class DelitoController {
       ],
     },
   })
+  @Auditar(Delito)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDelitoDto: DelitoDto,
@@ -161,6 +164,7 @@ export class DelitoController {
       ],
     },
   })
+  @Auditar(Delito)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.delitoService.remove(id);
   }
