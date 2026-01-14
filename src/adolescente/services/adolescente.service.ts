@@ -140,6 +140,7 @@ export class AdolescenteService {
           'gdos',
           'etnia',
           'canton',
+          'traslados',
         ],
       },
     );

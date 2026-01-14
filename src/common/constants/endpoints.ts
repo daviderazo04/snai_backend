@@ -41,6 +41,10 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
   { endpoint: '/provincias', descripcion: 'Catalogo de provincias' },
   { endpoint: '/cantones', descripcion: 'Catalogo de cantones' },
   { endpoint: '/cai', descripcion: 'Consulta de centros de atencion' },
+  {
+    endpoint: '/traslados',
+    descripcion: 'Gestion de traslados de adolescentes',
+  },
   // Parámetros
   { endpoint: '/parentesco', descripcion: 'Catalogo de parentescos' },
   { endpoint: '/etnia', descripcion: 'Catalogo de etnias' },

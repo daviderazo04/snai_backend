@@ -12,10 +12,22 @@ import { CaiService } from './services/cai.service';
 import { AuditoriaModule } from '../auditoria/auditoria.module';
 import { ProvinciaService } from './services/provincia.service';
 import { CantonService } from './services/canton.service';
+import { Traslado } from './entities/traslado.entity';
+import { TrasladoService } from './services/traslado.service';
+import { TrasladoController } from './controllers/traslado.controller';
+import { Adolescente } from '../adolescente/entities/adolescente.entity';
 
 @Module({
-  imports: [UsuarioModule, TypeOrmModule.forFeature([Provincia, Canton, Cai])],
-  providers: [ProvinciaService, CantonService, CaiService],
-  controllers: [ProvinciasController, CantonesController, CaiController],
+  imports: [
+    UsuarioModule,
+    TypeOrmModule.forFeature([Provincia, Canton, Cai, Traslado, Adolescente]),
+  ],
+  providers: [ProvinciaService, CantonService, CaiService, TrasladoService],
+  controllers: [
+    ProvinciasController,
+    CantonesController,
+    CaiController,
+    TrasladoController,
+  ],
 })
 export class LocalidadesModule {}

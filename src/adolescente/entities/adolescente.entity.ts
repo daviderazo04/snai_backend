@@ -19,6 +19,7 @@ import { Familia } from 'src/info-adolescente/entities/familia.entity';
 import { Estado } from 'src/common/enums/estado.enum';
 import { Salud } from '../../info-adolescente/entities/salud.entity';
 import { Educa } from '../../info-adolescente/entities/educa.entity';
+import { Traslado } from '../../localidades/entities/traslado.entity';
 
 @Entity('adolescente')
 export class Adolescente {
@@ -54,6 +55,8 @@ export class Adolescente {
   @OneToMany(() => Familia, (familia) => familia.adolescente)
   familia: Familia[];
 
+  @OneToMany(() => Traslado, (traslado) => traslado.adolecente)
+  traslados: Traslado[];
   // Campos de la tabla
   @ApiProperty({ description: 'Nombre del adolescente', example: 'Juan' })
   @Column({ length: 31 })
