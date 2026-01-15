@@ -64,6 +64,11 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
   { endpoint: '/educacion', descripcion: 'Registro educativo de adolescentes' },
   { endpoint: '/evento', descripcion: 'Catalogo de eventos' },
   { endpoint: '/familia', descripcion: 'Registro de interaccion familiar' },
+  // Reportería
+  {
+    endpoint: '/reporteria/demografico/etnia',
+    descripcion: 'Reporte demográfico por etnia',
+  },
 ] as const;
 
 export type EndpointPath = (typeof ALL_ENDPOINTS)[number]['endpoint'];
