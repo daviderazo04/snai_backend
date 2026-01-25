@@ -5,7 +5,7 @@ import { RepInfractor } from '../entities/repInfractor.entity';
 import { Adolescente } from '../entities/adolescente.entity';
 import { Representante } from '../entities/representante.entity';
 import { RepInfractorPayloadDto } from '../dto/repInfractor.payload.dto';
-import { ResultWithData } from 'src/common/dto/result.dto';
+import { ResultWithData, SimpleResult } from 'src/common/dto/result.dto';
 import { PaginatedResult } from 'src/common/dto/paginated.result.dto';
 
 @Injectable()
@@ -89,5 +89,79 @@ export class RepInfractorService {
 
     const totalPages = Math.ceil(total / size);
     return new PaginatedResult(result, totalPages, page, size);
+  }
+
+  async updateRepInfractor(
+    id: number,
+    payload: RepInfractorPayloadDto,
+  ): Promise<ResultWithData<RepInfractor>> {
+    try {
+      const repInfractor = await this.repInfractorRepository.findOneBy({ id });
+      if (!repInfractor)
+        return new ResultWithData<RepInfractor>(
+          false,
+          'No existe la relacion representante-adolescente con el id ingresado',
+          null,
+        );
+
+      const [adolescente, representante] = await Promise.all([
+        this.adolescenteRepository.findOneBy({ id: payload.adolescenteId }),
+        this.representanteRepository.findOneBy({
+          id: payload.representanteId,
+        }),
+      ]);
+
+      if (!adolescente)
+        return new ResultWithData<RepInfractor>(
+          false,
+          'No existe el adolescente con el id ingresado',
+          null,
+        );
+
+      if (!representante)
+        return new ResultWithData<RepInfractor>(
+          false,
+          'No existe el representante con el id ingresado',
+          null,
+        );
+
+      repInfractor.adolescente = adolescente;
+      repInfractor.representante = representante;
+      repInfractor.fechaInicio = new Date(payload.fechaInicio);
+      repInfractor.fechaFin = payload.fechaFin
+        ? new Date(payload.fechaFin)
+        : null;
+
+      const saved = await this.repInfractorRepository.save(repInfractor);
+      return new ResultWithData<RepInfractor>(
+        true,
+        'Relacion representante-adolescente actualizada exitosamente',
+        saved,
+      );
+    } catch (error) {
+      return new ResultWithData<RepInfractor>(
+        false,
+        (error as Error).message,
+        null,
+      );
+    }
+  }
+
+  async deleteRepInfractor(id: number): Promise<SimpleResult> {
+    try {
+      const repInfractor = await this.repInfractorRepository.findOneBy({ id });
+      if (!repInfractor)
+        return new SimpleResult(
+          false,
+          'No existe la relacion representante-adolescente con el id ingresado',
+        );
+      await this.repInfractorRepository.remove(repInfractor);
+      return new SimpleResult(
+        true,
+        'Relacion representante-adolescente eliminada exitosamente',
+      );
+    } catch (error) {
+      return new SimpleResult(false, (error as Error).message);
+    }
   }
 }

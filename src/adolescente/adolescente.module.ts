@@ -4,6 +4,8 @@ import { UsuarioModule } from '../usuario/usuario.module';
 import { Adolescente } from './entities/adolescente.entity';
 import { AdolescenteService } from './services/adolescente.service';
 import { AdolescentesController } from './controllers/adolescente.controller';
+import { RepresentantesController } from './controllers/representante.controller';
+import { RepInfractoresController } from './controllers/repInfractor.controller';
 import { Cai } from 'src/localidades/entities/cai.entity';
 import { Nacionalidad } from 'src/parametros/entities/nacionalidad.entity';
 import { EstadoCivil } from 'src/parametros/entities/estadoCivil';
@@ -32,7 +34,11 @@ import { RepInfractorService } from './services/repInfractor.service';
       RepInfractor,
     ]),
   ],
-  controllers: [AdolescentesController],
+  controllers: [
+    AdolescentesController,
+    RepresentantesController,
+    RepInfractoresController,
+  ],
   providers: [AdolescenteService, RepresentanteService, RepInfractorService],
 })
 export class AdolescenteModule {}

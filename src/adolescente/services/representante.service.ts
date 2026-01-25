@@ -6,7 +6,7 @@ import { Nacionalidad } from 'src/parametros/entities/nacionalidad.entity';
 import { Parentesco } from 'src/parametros/entities/parentesco.entity';
 import { Canton } from 'src/localidades/entities/canton.entity';
 import { RepresentantePayloadDto } from '../dto/representante.payload.dto';
-import { ResultWithData } from 'src/common/dto/result.dto';
+import { ResultWithData, SimpleResult } from 'src/common/dto/result.dto';
 import { PaginatedResult } from 'src/common/dto/paginated.result.dto';
 
 @Injectable()
@@ -97,5 +97,84 @@ export class RepresentanteService {
 
     const totalPages = Math.ceil(total / size);
     return new PaginatedResult(representantes, totalPages, page, size);
+  }
+
+  async updateRepresentante(
+    id: number,
+    payload: RepresentantePayloadDto,
+  ): Promise<ResultWithData<Representante>> {
+    try {
+      const representante = await this.representanteRepository.findOneBy({
+        id,
+      });
+      if (!representante)
+        return new ResultWithData<Representante>(
+          false,
+          'No existe el representante con el id ingresado',
+          null,
+        );
+
+      const [nacionalidad, parentesco, canton] = await Promise.all([
+        this.nacionalidadRepository.findOneBy({ id: payload.nacionalidadId }),
+        this.parentescoRepository.findOneBy({ id: payload.parentescoId }),
+        this.cantonRepository.findOneBy({ id: payload.cantonId }),
+      ]);
+
+      if (!nacionalidad)
+        return new ResultWithData<Representante>(
+          false,
+          'No existe la nacionalidad con el id ingresado',
+          null,
+        );
+      if (!parentesco)
+        return new ResultWithData<Representante>(
+          false,
+          'No existe el parentesco con el id ingresado',
+          null,
+        );
+      if (!canton)
+        return new ResultWithData<Representante>(
+          false,
+          'No existe el cantón con el id ingresado',
+          null,
+        );
+
+      representante.nombre = payload.nombre;
+      representante.apellido = payload.apellido;
+      representante.cedula = payload.cedula;
+      representante.nacionalidad = nacionalidad;
+      representante.parentesco = parentesco;
+      representante.canton = canton;
+
+      const saved = await this.representanteRepository.save(representante);
+      return new ResultWithData<Representante>(
+        true,
+        'Representante actualizado exitosamente',
+        saved,
+      );
+    } catch (error) {
+      return new ResultWithData<Representante>(
+        false,
+        (error as Error).message,
+        null,
+      );
+    }
+  }
+
+  async deleteRepresentante(id: number): Promise<SimpleResult> {
+    try {
+      const representante = await this.representanteRepository.findOneBy({
+        id,
+      });
+      if (!representante)
+        return new SimpleResult(
+          false,
+          'No existe el representante con el id ingresado',
+        );
+      await this.representanteRepository.remove(representante);
+      return new SimpleResult(true, 'Representante eliminado exitosamente');
+    } catch (error) {
+      return new SimpleResult(false, (error as Error).message);
+    }
   }
 }
