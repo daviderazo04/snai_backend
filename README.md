@@ -57,5 +57,5 @@ npm run test:e2e -- --runTestsByPath test/perfil-flow.e2e-spec.ts
 
 ## Notas del flujo e2e
 
-- `test/perfil-flow.e2e-spec.ts` limpia tablas (`permiso`, `sesion`, `endpoint`, `perfil`, `usuario`), registra usuario, crea endpoints, crea perfil con permisos y verifica acceso a `/usuario`.
+- `test/perfil-flow.e2e-spec.ts` limpia tablas (`permiso`, `session`, `endpoint`, `perfil`, `usuario`), registra usuario, crea endpoints, crea perfil con permisos y verifica acceso a `/usuario`.
 - Usa la misma DB definida en `.env`. Asegúrate de que sea una base de pruebas antes de correrlo porque borra datos de esos modelos.

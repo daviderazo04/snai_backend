@@ -48,8 +48,8 @@ WITH p AS (
 ), u AS (
   SELECT id FROM usuario WHERE correo = 'nuevo.admin@correo.com'
 )
-INSERT INTO sesion ("perfilId", "usuarioId")
+INSERT INTO session ("perfilId", "usuarioId")
 SELECT p.id, u.id FROM p, u
 WHERE NOT EXISTS (
-  SELECT 1 FROM sesion s WHERE s."perfilId" = (SELECT id FROM p) AND s."usuarioId" = (SELECT id FROM u)
+  SELECT 1 FROM session s WHERE s."perfilId" = (SELECT id FROM p) AND s."usuarioId" = (SELECT id FROM u)
 );

@@ -10,6 +10,7 @@ import {
 import {
   ApiBody,
   ApiExtraModels,
+  ApiOperation,
   ApiOkResponse,
   ApiParam,
   ApiQuery,
@@ -20,9 +21,14 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { UsuarioService } from '../services/usuario.service';
 import { PerfilAsignarPayload } from '../dto/perfil.asignar.payload.dto';
 import { RolesService } from '../services/roles.service';
-import { SimpleResult } from '../../common/dto/result.dto';
+import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import {
+  PerfilFlatResponseDto,
+  PermisoFlatResponseDto,
+  UsuarioWithPerfilFlatResponseDto,
+} from '../dto/permiso.flat.response.dto';
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('usuario')
 export class UsuarioController {
@@ -71,5 +77,32 @@ export class UsuarioController {
     @Query('size') size: number = 10,
   ) {
     return await this.userService.getSanitizedUsuarios(nombre, page, size);
+  }
+  @Get('/detalle/:id')
+  @ApiOperation({
+    summary: 'Detalle de usuario con perfiles y permisos',
+  })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+  @ApiExtraModels(
+    ResultWithData,
+    UsuarioWithPerfilFlatResponseDto,
+    PerfilFlatResponseDto,
+    PermisoFlatResponseDto,
+  )
+  @ApiOkResponse({
+    description: 'Detalle del usuario obtenido correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(UsuarioWithPerfilFlatResponseDto) },
+          },
+        },
+      ],
+    },
+  })
+  async getDetalleUsuario(@Param('id') id: number) {
+    return await this.userService.getUsuarioWithPerfiles(id);
   }
 }

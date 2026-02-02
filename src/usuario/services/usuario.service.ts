@@ -8,7 +8,13 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { ILike } from 'typeorm';
 import { PerfilDto } from '../../auth/dto/perfil.dto';
 import { Perfil } from '../entities/perfil.entity';
-import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
+import {
+  PerfilFlatResponseDto,
+  PermisoFlatResponseDto,
+  UsuarioWithPerfilFlatResponseDto,
+} from '../dto/permiso.flat.response.dto';
+import { ResultWithData } from '../../common/dto/result.dto';
+import { RolesService } from './roles.service';
 
 @Injectable()
 export class UsuarioService {
@@ -16,6 +22,7 @@ export class UsuarioService {
     private cryptService: CryptService,
     @InjectRepository(Usuario)
     private userRepository: Repository<Usuario>,
+    private rolesService: RolesService,
   ) {}
 
   async create(data: RegisterPayloadDto): Promise<Usuario> {
@@ -129,9 +136,34 @@ export class UsuarioService {
       return new PaginatedResult(perfiles, totalPages, page, size);
     }
   }
-
   async getUsuarioById(id: number): Promise<Usuario | null> {
     return this.userRepository.findOne({ where: { id } });
+  }
+  async getUsuarioWithPerfiles(
+    id: number,
+  ): Promise<ResultWithData<UsuarioWithPerfilFlatResponseDto>> {
+    const usuario = await this.userRepository.findOne({
+      where: { id },
+      relations: ['sesiones', 'sesiones.perfil'],
+    });
+    if (usuario == null)
+      return new ResultWithData<UsuarioWithPerfilFlatResponseDto>(
+        false,
+        'Usuario no encontrado',
+        null,
+      );
+    const perfiles: Array<PerfilFlatResponseDto> = [];
+    for (const session of usuario.sesiones) {
+      const flatPerfil = await this.rolesService.getFlatPermisosResultData(
+        session.perfil.id,
+      );
+      perfiles.push(flatPerfil.data!);
+    }
+    return new ResultWithData<UsuarioWithPerfilFlatResponseDto>(
+      true,
+      'Usuario obtenido correctamente',
+      new UsuarioWithPerfilFlatResponseDto(usuario, perfiles),
+    );
   }
   async getPerfiles(userId: number): Promise<PerfilDto[]> {
     const usuario = await this.userRepository.findOne({

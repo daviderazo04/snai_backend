@@ -1,6 +1,31 @@
 import { Permiso } from '../entities/permisos.entity';
 import { Perfil } from '../entities/perfil.entity';
+import { Usuario } from '../entities/usuario.entity';
+export class UsuarioWithPerfilFlatResponseDto {
+  id: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  estado: string;
+  createdAt: Date;
+  updatedAt: Date;
+  perfiles: PerfilFlatResponseDto[];
 
+  constructor(
+    usuario: Usuario,
+
+    perfiles: PerfilFlatResponseDto[],
+  ) {
+    this.id = usuario.id;
+    this.nombre = usuario.nombre;
+    this.apellido = usuario.apellido;
+    this.correo = usuario.correo;
+    this.estado = usuario.estado.toString();
+    this.createdAt = usuario.createdAt;
+    this.updatedAt = usuario.updatedAt;
+    this.perfiles = perfiles;
+  }
+}
 export class PerfilFlatResponseDto {
   id: number;
   nombre: string;
