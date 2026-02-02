@@ -21,7 +21,22 @@ type SeedDeps = {
   sesionRepo: Repository<Sesion>;
 };
 
+const LEGACY_ENDPOINT_RENAMES: Record<string, string> = {
+  '/perfil/detalle/:id': '/perfil/detalle',
+};
+
 async function ensureEndpoints(deps: SeedDeps) {
+  for (const [oldPath, newPath] of Object.entries(LEGACY_ENDPOINT_RENAMES)) {
+    if (oldPath === newPath) continue;
+    const legacy = await deps.endpointRepo.findOneBy({ endpoint: oldPath });
+    const target = await deps.endpointRepo.findOneBy({ endpoint: newPath });
+    if (legacy && !target) {
+      legacy.endpoint = newPath;
+      await deps.endpointRepo.save(legacy);
+      console.log(`Endpoint renombrado: ${oldPath} -> ${newPath}`);
+    }
+  }
+
   const createdOrFound: Endpoint[] = [];
   for (const { endpoint: path, descripcion } of ALL_ENDPOINTS) {
     let endpoint = await deps.endpointRepo.findOneBy({ endpoint: path });
