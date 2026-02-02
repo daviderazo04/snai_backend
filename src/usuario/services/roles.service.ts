@@ -24,6 +24,16 @@ export class RolesService {
     @InjectRepository(Endpoint)
     private readonly endpointsRepository: Repository<Endpoint>,
   ) {}
+  async getFlatPermisosResultData(
+    perfilId: number,
+  ): Promise<ResultWithData<PermisoFlatResponseDto[]>> {
+    const permisos = await this.getFlatPermisosDePerfil(perfilId);
+    return new ResultWithData<PermisoFlatResponseDto[]>(
+      true,
+      'Permisos obtenidos correctamente',
+      permisos,
+    );
+  }
   async getFlatPermisosDePerfil(
     perfilId: number,
   ): Promise<PermisoFlatResponseDto[]> {

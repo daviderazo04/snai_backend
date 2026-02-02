@@ -3,9 +3,10 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
-  Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PerfilPayloadDto } from '../dto/perfil.payload.dto';
@@ -16,18 +17,19 @@ import {
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { PerfilUpdatePayloadDto } from '../dto/perfil.update.payload.dto';
-import { Query } from '@nestjs/common';
 import { Perfil } from '../entities/perfil.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { UsuarioService } from '../services/usuario.service';
 import { Usuario } from '../entities/usuario.entity';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
+import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
 
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('perfil')
@@ -108,5 +110,30 @@ export class PerfilController {
     @Query('size') size: number = 10,
   ) {
     return await this.roleService.getPerfiles(nombre, page, size);
+  }
+  @Get('/detalle/:id')
+  @ApiOperation({ summary: 'Detalle de permisos de un perfil' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del perfil' })
+  @ApiExtraModels(ResultWithData, PermisoFlatResponseDto)
+  @ApiOkResponse({
+    description: 'Permisos del perfil obtenidos correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(PermisoFlatResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
+  async getDetallePerfil(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResultWithData<PermisoFlatResponseDto[]>> {
+    return await this.roleService.getFlatPermisosResultData(id);
   }
 }
