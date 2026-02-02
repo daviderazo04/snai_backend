@@ -36,6 +36,11 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     endpoint: '/usuario/detalle/:id',
     descripcion: 'Detalle de un usuario con sus perfiles y permisos',
   },
+
+  {
+    endpoint: '/usuario/detalle',
+    descripcion: 'Detalle de un usuario con sus perfiles y permisos',
+  },
   {
     endpoint: '/endpoints',
     descripcion: 'Listado aplanado de endpoints disponibles',
