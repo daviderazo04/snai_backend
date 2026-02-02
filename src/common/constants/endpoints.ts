@@ -42,7 +42,7 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     descripcion: 'Gestion de un perfil especifico',
   },
   {
-    endpoint: '/perfil/detalle/:id',
+    endpoint: '/perfil/detalle',
     descripcion: 'Consulta de permisos aplanados de un perfil',
   },
   {
