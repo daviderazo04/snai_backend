@@ -11,8 +11,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PerfilAsignarPayload } from '../dto/perfil.asignar.payload.dto';
 import { Usuario } from '../entities/usuario.entity';
 import { Sesion } from '../entities/sesion.entity';
-import { PerfilDto } from '../../auth/dto/perfil.dto';
-import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
+import {
+  PerfilFlatResponseDto,
+  PermisoFlatResponseDto,
+} from '../dto/permiso.flat.response.dto';
 import { EndpointFlatResponseDto } from '../dto/endpoint.flat.response.dto';
 
 @Injectable()
@@ -26,12 +28,23 @@ export class RolesService {
   ) {}
   async getFlatPermisosResultData(
     perfilId: number,
-  ): Promise<ResultWithData<PermisoFlatResponseDto[]>> {
+  ): Promise<ResultWithData<PerfilFlatResponseDto>> {
+    const perfil = await this.perfilesRepository.findOne({
+      where: { id: perfilId },
+      relations: [],
+    });
+    if (!perfil)
+      return new ResultWithData<PerfilFlatResponseDto>(
+        false,
+        'No existe este perfil',
+        null,
+      );
     const permisos = await this.getFlatPermisosDePerfil(perfilId);
-    return new ResultWithData<PermisoFlatResponseDto[]>(
+    const res = new PerfilFlatResponseDto(perfil, permisos);
+    return new ResultWithData<PerfilFlatResponseDto>(
       true,
       'Permisos obtenidos correctamente',
-      permisos,
+      res,
     );
   }
   async getFlatPermisosDePerfil(

@@ -1,5 +1,18 @@
 import { Permiso } from '../entities/permisos.entity';
+import { Perfil } from '../entities/perfil.entity';
 
+export class PerfilFlatResponseDto {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  permisos: PermisoFlatResponseDto[];
+  constructor(perfil: Perfil, permisos: PermisoFlatResponseDto[]) {
+    this.id = perfil.id;
+    this.nombre = perfil.nombre;
+    this.descripcion = perfil.descripcion;
+    this.permisos = permisos;
+  }
+}
 export class PermisoFlatResponseDto {
   endpoint: string;
   descripcion: string;

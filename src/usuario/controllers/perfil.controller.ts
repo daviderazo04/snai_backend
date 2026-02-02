@@ -26,10 +26,12 @@ import { PerfilUpdatePayloadDto } from '../dto/perfil.update.payload.dto';
 import { Perfil } from '../entities/perfil.entity';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { UsuarioService } from '../services/usuario.service';
-import { Usuario } from '../entities/usuario.entity';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
-import { PermisoFlatResponseDto } from '../dto/permiso.flat.response.dto';
+import {
+  PerfilFlatResponseDto,
+  PermisoFlatResponseDto,
+} from '../dto/permiso.flat.response.dto';
 
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('perfil')
@@ -114,7 +116,11 @@ export class PerfilController {
   @Get('/detalle/:id')
   @ApiOperation({ summary: 'Detalle de permisos de un perfil' })
   @ApiParam({ name: 'id', type: Number, description: 'ID del perfil' })
-  @ApiExtraModels(ResultWithData, PermisoFlatResponseDto)
+  @ApiExtraModels(
+    ResultWithData,
+    PerfilFlatResponseDto,
+    PermisoFlatResponseDto,
+  )
   @ApiOkResponse({
     description: 'Permisos del perfil obtenidos correctamente',
     schema: {
@@ -122,10 +128,7 @@ export class PerfilController {
         { $ref: getSchemaPath(ResultWithData) },
         {
           properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(PermisoFlatResponseDto) },
-            },
+            data: { $ref: getSchemaPath(PerfilFlatResponseDto) },
           },
         },
       ],
@@ -133,7 +136,7 @@ export class PerfilController {
   })
   async getDetallePerfil(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<ResultWithData<PermisoFlatResponseDto[]>> {
+  ): Promise<ResultWithData<PerfilFlatResponseDto>> {
     return await this.roleService.getFlatPermisosResultData(id);
   }
 }
