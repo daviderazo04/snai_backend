@@ -45,6 +45,10 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     endpoint: '/perfil/detalle/:id',
     descripcion: 'Consulta de permisos aplanados de un perfil',
   },
+  {
+    endpoint: '/perfil/detalle',
+    descripcion: 'Consulta de permisos aplanados de un perfil',
+  },
   // Localidades
   { endpoint: '/provincias', descripcion: 'Catalogo de provincias' },
   {
