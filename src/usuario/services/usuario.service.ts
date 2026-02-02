@@ -172,8 +172,10 @@ export class UsuarioService {
     });
     const perfiles: PerfilDto[] = [];
     usuario?.sesiones.forEach((sesion) => {
-      const perfil = new PerfilDto(sesion.perfil.id, sesion.perfil.nombre);
-      perfiles.push(perfil);
+      if (!perfiles.some((p) => p.id == sesion.perfil.id)) {
+        const perfil = new PerfilDto(sesion.perfil.id, sesion.perfil.nombre);
+        perfiles.push(perfil);
+      }
     });
     return perfiles;
   }
