@@ -141,6 +141,22 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     endpoint: '/reporteria/demografico/etnia',
     descripcion: 'Reporte demográfico por etnia',
   },
+  {
+    endpoint: '/reporteria/matriz/nacionalidad',
+    descripcion: 'Matriz nacionalidad vs CAI',
+  },
+  {
+    endpoint: '/reporteria/matriz/edad',
+    descripcion: 'Matriz edad vs CAI',
+  },
+  {
+    endpoint: '/reporteria/matriz/infraccion',
+    descripcion: 'Matriz infracción vs CAI',
+  },
+  {
+    endpoint: '/reporteria/matriz/medidas',
+    descripcion: 'Matriz medidas vs CAI',
+  },
 ] as const;
 
 export type EndpointPath = (typeof ALL_ENDPOINTS)[number]['endpoint'];
