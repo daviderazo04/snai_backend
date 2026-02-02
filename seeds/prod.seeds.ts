@@ -30,7 +30,34 @@ async function ensureEndpoints(deps: SeedDeps) {
     if (oldPath === newPath) continue;
     const legacy = await deps.endpointRepo.findOneBy({ endpoint: oldPath });
     const target = await deps.endpointRepo.findOneBy({ endpoint: newPath });
-    if (legacy && !target) {
+    if (legacy && target) {
+      const legacyPermisos = await deps.permisoRepo.find({
+        where: { endpoint: { id: legacy.id } },
+        relations: ['perfil'],
+      });
+      for (const permiso of legacyPermisos) {
+        const existing = await deps.permisoRepo.findOne({
+          where: {
+            endpoint: { id: target.id },
+            perfil: { id: permiso.perfil.id },
+          },
+        });
+        if (!existing) {
+          const migrated = deps.permisoRepo.create({
+            endpoint: target,
+            perfil: permiso.perfil,
+            VIEW: permiso.VIEW,
+            EDIT: permiso.EDIT,
+          });
+          await deps.permisoRepo.save(migrated);
+        }
+        await deps.permisoRepo.delete(permiso.id);
+      }
+      await deps.endpointRepo.delete(legacy.id);
+      console.log(
+        `Endpoint duplicado consolidado: ${oldPath} -> ${newPath} (permisos migrados)`,
+      );
+    } else if (legacy && !target) {
       legacy.endpoint = newPath;
       await deps.endpointRepo.save(legacy);
       console.log(`Endpoint renombrado: ${oldPath} -> ${newPath}`);
