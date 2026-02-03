@@ -31,6 +31,7 @@ export class CaiService {
         take: size,
         skip: skip,
         where: { estado: Equal(Estado.ACTIVO) },
+        relations: ['canton', 'canton.provincia'],
       });
       const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(cais, totalPages, page, size);
@@ -39,6 +40,7 @@ export class CaiService {
         where: { nombre: ILike(`%${nombre}%`), estado: Equal(Estado.ACTIVO) },
         take: size,
         skip: skip,
+        relations: ['canton', 'canton.provincia'],
       });
       const totalPages = Math.ceil(totales / size);
       return new PaginatedResult(cais, totalPages, page, size);
