@@ -184,7 +184,10 @@ export class RolesService {
   ): Promise<SimpleResult> {
     const result = await this.dataSource.transaction(async (manager) => {
       try {
-        const usuario = await manager.findOneBy(Usuario, { id });
+        const usuario = await manager.findOne(Usuario, {
+          where: { id: id },
+          relations: ['sesiones', 'sesiones.perfil'],
+        });
         if (!usuario) {
           throw new Error(`Usuario con ID ${id} no encontrado`);
         }
@@ -192,6 +195,11 @@ export class RolesService {
           const perfil = await manager.findOneBy(Perfil, { id: perfilId });
           if (!perfil) {
             throw new Error(`Perfil con ID ${perfilId} no encontrado`);
+          }
+          if (usuario.sesiones.some(({ perfil }) => perfil.id == perfilId)) {
+            throw new Error(
+              `El usuario ya tiene asignado el perfil con ID ${perfilId}`,
+            );
           }
           const nuevoSesion = manager.create(Sesion, {
             usuario: usuario,
