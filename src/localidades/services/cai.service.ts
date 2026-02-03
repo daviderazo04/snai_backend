@@ -26,6 +26,7 @@ export class CaiService {
     size: number = 10,
   ): Promise<PaginatedResult<Cai>> {
     //Se envia canton
+    //
     const skip = (page - 1) * size;
     if (nombre == '') {
       const [cais, totales] = await this.caiRepository.findAndCount({
