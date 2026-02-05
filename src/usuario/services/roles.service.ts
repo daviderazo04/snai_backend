@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, ILike, Repository } from 'typeorm';
+import { DataSource, ILike, Like, Not, Repository } from 'typeorm';
 import { Perfil } from '../entities/perfil.entity';
 import { PerfilPayloadDto } from '../dto/perfil.payload.dto';
 import { Permiso } from '../entities/permisos.entity';
@@ -69,6 +69,7 @@ export class RolesService {
   async getFlatEndpoints(): Promise<EndpointFlatResponseDto[]> {
     const endpoints = await this.endpointsRepository.find({
       select: ['endpoint', 'descripcion'],
+      where: { endpoint: Not(Like('%auth%')) },
       order: { endpoint: 'ASC' },
     });
     return endpoints.map(
