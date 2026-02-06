@@ -192,6 +192,7 @@ export class RolesService {
         if (!usuario) {
           throw new Error(`Usuario con ID ${id} no encontrado`);
         }
+        await manager.delete(Sesion, { usuario: { id: usuario.id } });
         for (const perfilId of payload.perfiles) {
           const perfil = await manager.findOneBy(Perfil, { id: perfilId });
           if (!perfil) {

@@ -25,7 +25,7 @@ async function bootstrap() {
   } catch (err) {
     logger.error('Error al ejecutar seeds de producción', err as Error);
   }
-
+  //Por motivos de testeo el cors admite todos los origenes, antes de pasar a prd se debe cambiar esto a la url especifica
   app.enableCors({ origin: '*' });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
