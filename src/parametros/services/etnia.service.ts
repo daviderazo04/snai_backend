@@ -49,8 +49,19 @@ export class EtniaService {
   }
   async softDeleteEtnia(id: number): Promise<SimpleResult> {
     try {
-      const etnia = await this.etniaRepository.findOneBy({ id: id });
+      const etnia = await this.etniaRepository.findOne({
+        where: { id: id },
+        relations: ['adolescentes'],
+      });
       if (!etnia) throw new Error('No existe la etnia con el id ingresado');
+      const hasActiveAdolescentes = etnia.adolescentes?.some(
+        (adolescente) => adolescente.estado === Estado.ACTIVO,
+      );
+      if (hasActiveAdolescentes) {
+        throw new Error(
+          'No se puede eliminar la etnia porque tiene adolescentes asociados',
+        );
+      }
       etnia.estado = Estado.INACTIVO;
       await this.etniaRepository.save(etnia);
       return new SimpleResult(true, 'Etnia eliminada exitosamente');

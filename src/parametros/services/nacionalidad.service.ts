@@ -54,11 +54,23 @@ export class NacionalidadService {
   }
   async softDeleteNacionalidad(id: number): Promise<SimpleResult> {
     try {
-      const nacionalidad = await this.nacionalidadRepository.findOneBy({
-        id: id,
+      const nacionalidad = await this.nacionalidadRepository.findOne({
+        where: {
+          id: id,
+        },
+        relations: ['adolescentes', 'representantes'],
       });
       if (!nacionalidad)
         throw new Error('No existe la nacionalidad con el id ingresado');
+      const hasActiveAdolescentes = nacionalidad.adolescentes?.some(
+        (adolescente) => adolescente.estado === Estado.ACTIVO,
+      );
+      const hasRepresentantes = (nacionalidad.representantes ?? []).length > 0;
+      if (hasActiveAdolescentes || hasRepresentantes) {
+        throw new Error(
+          'No se puede eliminar la nacionalidad porque tiene registros asociados',
+        );
+      }
       nacionalidad.estado = Estado.INACTIVO;
       await this.nacionalidadRepository.save(nacionalidad);
       return new SimpleResult(true, 'Nacionalidad eliminada exitosamente');

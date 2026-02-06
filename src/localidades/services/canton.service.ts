@@ -20,8 +20,23 @@ export class CantonService {
 
   async softDeleteCaton(id: number): Promise<SimpleResult> {
     try {
-      const canton = await this.cantonRepository.findOneBy({ id: id });
-      if (!canton) throw new Error('Provincia no encontrada');
+      const canton = await this.cantonRepository.findOne({
+        where: { id: id },
+        relations: ['cais', 'adolescentes', 'representantes'],
+      });
+      if (!canton) throw new Error('Canton no encontrado');
+      const hasActiveCais = canton.cais?.some(
+        (cai) => cai.estado === Estado.ACTIVO,
+      );
+      const hasActiveAdolescentes = canton.adolescentes?.some(
+        (adolescente) => adolescente.estado === Estado.ACTIVO,
+      );
+      const hasRepresentantes = (canton.representantes ?? []).length > 0;
+      if (hasActiveCais || hasActiveAdolescentes || hasRepresentantes) {
+        throw new Error(
+          'No se puede eliminar el canton porque tiene registros asociados',
+        );
+      }
       canton.estado = Estado.INACTIVO;
       await this.cantonRepository.save(canton);
       return new SimpleResult(true, 'Canton eliminado');

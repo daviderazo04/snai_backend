@@ -79,11 +79,22 @@ export class EstadoCivilService {
   }
   async softDeleteEstadoCivil(id: number): Promise<SimpleResult> {
     try {
-      const estadoCivil = await this.estadoCivilRepository.findOneBy({
-        id: id,
+      const estadoCivil = await this.estadoCivilRepository.findOne({
+        where: {
+          id: id,
+        },
+        relations: ['adolescentes'],
       });
       if (!estadoCivil)
         throw new Error('No existe el estado civil con el id ingresado');
+      const hasActiveAdolescentes = estadoCivil.adolescentes?.some(
+        (adolescente) => adolescente.estado === Estado.ACTIVO,
+      );
+      if (hasActiveAdolescentes) {
+        throw new Error(
+          'No se puede eliminar el estado civil porque tiene adolescentes asociados',
+        );
+      }
       estadoCivil.estado = Estado.INACTIVO;
       await this.estadoCivilRepository.save(estadoCivil);
       return new SimpleResult(true, 'Estado civil eliminado exitosamente');

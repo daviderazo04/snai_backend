@@ -49,8 +49,19 @@ export class GdosService {
   }
   async softDeleteGdos(id: number): Promise<SimpleResult> {
     try {
-      const gdos = await this.gdosRepository.findOneBy({ id: id });
+      const gdos = await this.gdosRepository.findOne({
+        where: { id: id },
+        relations: ['adolescentes'],
+      });
       if (!gdos) throw new Error('No existe el gdos con el id ingresado');
+      const hasActiveAdolescentes = gdos.adolescentes?.some(
+        (adolescente) => adolescente.estado === Estado.ACTIVO,
+      );
+      if (hasActiveAdolescentes) {
+        throw new Error(
+          'No se puede eliminar el gdos porque tiene adolescentes asociados',
+        );
+      }
       gdos.estado = Estado.INACTIVO;
       await this.gdosRepository.save(gdos);
       return new SimpleResult(true, 'Gdos eliminado exitosamente');

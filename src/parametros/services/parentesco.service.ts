@@ -53,9 +53,18 @@ export class ParentescoService {
   }
   async softDeleteParentesco(id: number): Promise<SimpleResult> {
     try {
-      const parentesco = await this.parentescoRepository.findOneBy({ id: id });
+      const parentesco = await this.parentescoRepository.findOne({
+        where: { id: id },
+        relations: ['representantes'],
+      });
       if (!parentesco)
         throw new Error('No existe el parentesco con el id ingresado');
+      const hasRepresentantes = (parentesco.representantes ?? []).length > 0;
+      if (hasRepresentantes) {
+        throw new Error(
+          'No se puede eliminar el parentesco porque tiene representantes asociados',
+        );
+      }
       parentesco.estado = Estado.INACTIVO;
       await this.parentescoRepository.save(parentesco);
       return new SimpleResult(true, 'Parentesco eliminado exitosamente');

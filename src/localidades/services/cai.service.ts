@@ -91,8 +91,22 @@ export class CaiService {
   }
   async softDeleteCai(id: number): Promise<SimpleResult> {
     try {
-      const cai = await this.caiRepository.findOneBy({ id: id });
+      const cai = await this.caiRepository.findOne({
+        where: { id: id },
+        relations: ['traslados', 'adolescentes'],
+      });
       if (!cai) throw new Error('Cai no encontrado');
+      const hasActiveTraslados = cai.traslados?.some(
+        (traslado) => traslado.estado === Estado.ACTIVO,
+      );
+      const hasActiveAdolescentes = cai.adolescentes?.some(
+        (adolescente) => adolescente.estado === Estado.ACTIVO,
+      );
+      if (hasActiveTraslados || hasActiveAdolescentes) {
+        throw new Error(
+          'No se puede eliminar el cai porque tiene registros asociados',
+        );
+      }
       cai.estado = Estado.INACTIVO;
       await this.caiRepository.save(cai);
       return new SimpleResult(true, 'Cai eliminado');

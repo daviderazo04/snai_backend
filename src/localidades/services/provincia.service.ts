@@ -60,8 +60,19 @@ export class ProvinciaService {
   }
   async softDeleteProvincia(id: number): Promise<SimpleResult> {
     try {
-      const provincia = await this.provinciaRepository.findOneBy({ id: id });
+      const provincia = await this.provinciaRepository.findOne({
+        where: { id: id },
+        relations: ['cantones'],
+      });
       if (!provincia) throw new Error('Provincia no encontrada');
+      const hasActiveCantones = provincia.cantones?.some(
+        (canton) => canton.estado === Estado.ACTIVO,
+      );
+      if (hasActiveCantones) {
+        throw new Error(
+          'No se puede eliminar la provincia porque tiene cantones asociados',
+        );
+      }
       provincia.estado = Estado.INACTIVO;
       await this.provinciaRepository.save(provincia);
       return new SimpleResult(true, 'Provincia eliminada');
