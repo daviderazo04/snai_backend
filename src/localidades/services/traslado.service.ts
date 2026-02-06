@@ -31,15 +31,11 @@ export class TrasladoService {
       },
       relations: ['cai'],
     });
-    if (adolescente!.estado == Estado.INACTIVO) {
-      return new ResultWithData<Traslado>(false, 'Adolescente inactivo', null);
+    if (!adolescente) {
+      return new ResultWithData<Traslado>(false, 'Adolescente no existe', null);
     }
-    if (adolescente?.cai.id != payload.fromCaiId) {
-      return new ResultWithData<Traslado>(
-        false,
-        'El cai de partida no coincide con el CAI donde el adolcente esta ahora',
-        null,
-      );
+    if (adolescente.estado == Estado.INACTIVO) {
+      return new ResultWithData<Traslado>(false, 'Adolescente inactivo', null);
     }
     const cai = await this.caiRepository.findOneBy({ id: payload.toCaiId });
     if (cai!.estado == Estado.INACTIVO) {
@@ -50,6 +46,7 @@ export class TrasladoService {
     traslado.observaciones = payload.observaciones;
     traslado.adolecente = adolescente!;
     traslado.toCai = cai!;
+    traslado.fromCai = adolescente.cai;
     await this.trasladoRepository.save(traslado);
     adolescente.cai = cai!;
     await this.adolescenteRepository.save(adolescente);
