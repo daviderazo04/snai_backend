@@ -37,7 +37,7 @@ export class TrasladoService {
     if (adolescente.estado == Estado.INACTIVO) {
       return new ResultWithData<Traslado>(false, 'Adolescente inactivo', null);
     }
-    const cai = await this.caiRepository.findOneBy({ id: payload.toCaiId });
+    const cai = await this.caiRepository.findOneBy({ id: payload.caiId });
     if (cai!.estado == Estado.INACTIVO) {
       return new ResultWithData<Traslado>(false, 'Cai inactivo', null);
     }
