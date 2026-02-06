@@ -45,7 +45,7 @@ export class TrasladoService {
     traslado.fecha = payload.fecha;
     traslado.observaciones = payload.observaciones;
     traslado.adolecente = adolescente!;
-    traslado.toCai = cai!;
+    traslado.cai = cai!;
     traslado.fromCai = adolescente.cai;
     await this.trasladoRepository.save(traslado);
     adolescente.cai = cai!;
@@ -76,7 +76,7 @@ export class TrasladoService {
       if (cai.estado == Estado.INACTIVO) {
         return new ResultWithData<Traslado>(false, 'Cai inactivo', null);
       }
-      traslado.toCai = cai!;
+      traslado.cai = cai!;
       adolecente.cai = cai!;
     }
     if (payload.fecha != null) {
@@ -107,7 +107,7 @@ export class TrasladoService {
       where,
       take: size,
       skip,
-      relations: ['adolecente', 'cai'],
+      relations: ['adolecente', 'toCai'],
     });
     const totalPages = Math.ceil(total / size);
     return new PaginatedResult(traslados, totalPages, page, size);

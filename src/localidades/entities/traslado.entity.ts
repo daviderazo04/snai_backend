@@ -22,7 +22,7 @@ export class Traslado {
     type: () => Cai,
   })
   @ManyToOne(() => Cai, (cai) => cai.traslados)
-  toCai: Cai;
+  cai: Cai;
   @ApiProperty({
     description: 'Adolescente que es trasladado',
     type: () => Adolescente,
