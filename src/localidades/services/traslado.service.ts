@@ -107,7 +107,7 @@ export class TrasladoService {
       where,
       take: size,
       skip,
-      relations: ['adolecente', 'toCai'],
+      relations: ['adolecente', 'cai', 'fromCai'],
     });
     const totalPages = Math.ceil(total / size);
     return new PaginatedResult(traslados, totalPages, page, size);
