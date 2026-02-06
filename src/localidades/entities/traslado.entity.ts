@@ -12,12 +12,17 @@ export class Traslado {
   id: number;
 
   @ApiProperty({
+    description: 'CAI desque el cual sale el traslado',
+    type: () => Cai,
+  })
+  @ManyToOne(() => Cai, (cai) => cai.traslados)
+  fromCai: Cai;
+  @ApiProperty({
     description: 'CAI al que se realiza el traslado',
     type: () => Cai,
   })
   @ManyToOne(() => Cai, (cai) => cai.traslados)
-  cai: Cai;
-
+  toCai: Cai;
   @ApiProperty({
     description: 'Adolescente que es trasladado',
     type: () => Adolescente,

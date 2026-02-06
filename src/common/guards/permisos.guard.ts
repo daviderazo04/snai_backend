@@ -48,24 +48,23 @@ export class PermisosGuard implements CanActivate {
       `auth route=${rutaEstandar} method=${metodo} perfil=(${user.perfilActivo.nombre},${user.perfilActivo.id}) allowed=${permitido}`,
     );
     const rutaAuditoria = this.getAuditPath(req);
-    const idAuditable = await this.auditoriaService.createAuditoria(
-      user.id,
-      rutaAuditoria,
-      metodo,
-      permitido,
-      JSON.stringify(req.body),
-    );
-
-    req.auditoriaId = idAuditable;
-
-    if (!permitido) {
-      await this.auditoriaService.completeAuditoria(
-        idAuditable,
-        false,
-        'No autorizado',
+    if (metodo != 'GET') {
+      const idAuditable = await this.auditoriaService.createAuditoria(
+        user.id,
+        rutaAuditoria,
+        metodo,
+        permitido,
+        JSON.stringify(req.body),
       );
+      req.auditoriaId = idAuditable;
+      if (!permitido) {
+        await this.auditoriaService.completeAuditoria(
+          idAuditable,
+          false,
+          'No autorizado',
+        );
+      }
     }
-
     return permitido;
   }
 

@@ -11,7 +11,11 @@ export class TrasladoCreatePayload {
   @IsInt({ message: 'El ID del CAI debe ser un número entero' })
   @IsNotEmpty({ message: 'El ID del CAI es obligatorio' })
   @Type(() => Number)
-  caiId: number;
+  toCaiId: number;
+  @IsInt({ message: 'El ID del CAI debe ser un número entero' })
+  @IsNotEmpty({ message: 'El ID del CAI es obligatorio' })
+  @Type(() => Number)
+  fromCaiId: number;
 
   @ApiProperty({
     description: 'ID del adolescente que es trasladado',
@@ -42,7 +46,6 @@ export class TrasladoCreatePayload {
     type: String,
   })
   @IsString({ message: 'Las observaciones deben ser una cadena de texto' })
-  @IsNotEmpty({ message: 'Las observaciones son obligatorias' })
   observaciones: string;
 }
 export class TrasladoUpdatePayload {

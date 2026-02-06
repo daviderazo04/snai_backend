@@ -25,13 +25,23 @@ export class TrasladoService {
   async createTraslado(
     payload: TrasladoCreatePayload,
   ): Promise<ResultWithData<Traslado>> {
-    const adolescente = await this.adolescenteRepository.findOneBy({
-      id: payload.adolescenteId,
+    const adolescente = await this.adolescenteRepository.findOne({
+      where: {
+        id: payload.adolescenteId,
+      },
+      relations: ['cai'],
     });
     if (adolescente!.estado == Estado.INACTIVO) {
       return new ResultWithData<Traslado>(false, 'Adolescente inactivo', null);
     }
-    const cai = await this.caiRepository.findOneBy({ id: payload.caiId });
+    if (adolescente?.cai.id != payload.fromCaiId) {
+      return new ResultWithData<Traslado>(
+        false,
+        'El cai de partida no coincide con el CAI donde el adolcente esta ahora',
+        null,
+      );
+    }
+    const cai = await this.caiRepository.findOneBy({ id: payload.toCaiId });
     if (cai!.estado == Estado.INACTIVO) {
       return new ResultWithData<Traslado>(false, 'Cai inactivo', null);
     }
@@ -39,8 +49,10 @@ export class TrasladoService {
     traslado.fecha = payload.fecha;
     traslado.observaciones = payload.observaciones;
     traslado.adolecente = adolescente!;
-    traslado.cai = cai!;
+    traslado.toCai = cai!;
     await this.trasladoRepository.save(traslado);
+    adolescente.cai = cai!;
+    await this.adolescenteRepository.save(adolescente);
     return new ResultWithData<Traslado>(
       true,
       'Traslado creado exitosamente',
@@ -51,7 +63,11 @@ export class TrasladoService {
     payload: TrasladoUpdatePayload,
     id: number,
   ): Promise<ResultWithData<Traslado>> {
-    const traslado = await this.trasladoRepository.findOneBy({ id: id });
+    const traslado = await this.trasladoRepository.findOne({
+      where: { id: id },
+      relations: ['cai', 'adelecente'],
+    });
+    const adolecente = traslado!.adolecente;
     if (traslado == null) {
       return new ResultWithData<Traslado>(false, 'Cai no encontrado', null);
     }
@@ -63,7 +79,8 @@ export class TrasladoService {
       if (cai.estado == Estado.INACTIVO) {
         return new ResultWithData<Traslado>(false, 'Cai inactivo', null);
       }
-      traslado.cai = cai!;
+      traslado.toCai = cai!;
+      adolecente.cai = cai!;
     }
     if (payload.fecha != null) {
       traslado.fecha = payload.fecha;
@@ -72,6 +89,7 @@ export class TrasladoService {
       traslado.observaciones = payload.observaciones;
     }
     await this.trasladoRepository.save(traslado);
+    await this.adolescenteRepository.save(adolecente);
     return new ResultWithData<Traslado>(
       true,
       'Traslado actualizado exitosamente',
@@ -98,12 +116,19 @@ export class TrasladoService {
     return new PaginatedResult(traslados, totalPages, page, size);
   }
   async softDeleteTraslado(id: number): Promise<ResultWithData<Traslado>> {
-    const traslado = await this.trasladoRepository.findOneBy({ id: id });
+    const traslado = await this.trasladoRepository.findOne({
+      where: { id: id },
+      relations: ['cai', 'adelecente'],
+    });
+    const adolecente = traslado!.adolecente;
     if (traslado == null) {
       return new ResultWithData<Traslado>(false, 'Cai no encontrado', null);
     }
     traslado.estado = Estado.INACTIVO;
+    //revertimos
+    adolecente.cai = traslado.fromCai;
     await this.trasladoRepository.save(traslado);
+    await this.adolescenteRepository.save(adolecente);
     return new ResultWithData<Traslado>(
       true,
       'Traslado eliminado exitosamente',

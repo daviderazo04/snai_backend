@@ -28,7 +28,7 @@ export class Cai {
   @Column()
   nombre: string;
 
-  @OneToMany(() => Traslado, (traslado) => traslado.cai)
+  @OneToMany(() => Traslado, (traslado) => traslado.toCai)
   traslados: Traslado[];
   @OneToMany(() => Adolescente, (adolescente) => adolescente.cai)
   adolescentes: Adolescente[];

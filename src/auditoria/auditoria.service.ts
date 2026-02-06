@@ -50,6 +50,7 @@ export class AuditoriaService {
   ) {
     const repo = this.dataSource.getRepository<T>(entity);
     const beforeData = await repo.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       where: { id: idEntidad } as any,
     });
 
@@ -65,6 +66,7 @@ export class AuditoriaService {
   ) {
     const repo = this.dataSource.getRepository<T>(entity);
     const afterData = await repo.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       where: { id: idEntidad } as any,
     });
 
