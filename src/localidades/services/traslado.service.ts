@@ -41,6 +41,13 @@ export class TrasladoService {
     if (cai!.estado == Estado.INACTIVO) {
       return new ResultWithData<Traslado>(false, 'Cai inactivo', null);
     }
+    if (cai!.id == adolescente.cai.id) {
+      return new ResultWithData<Traslado>(
+        false,
+        'No puedes generar un traslado si el adolecente ya esta ahi',
+        null,
+      );
+    }
     const traslado = new Traslado();
     traslado.fecha = payload.fecha;
     traslado.observaciones = payload.observaciones;
@@ -75,6 +82,13 @@ export class TrasladoService {
       }
       if (cai.estado == Estado.INACTIVO) {
         return new ResultWithData<Traslado>(false, 'Cai inactivo', null);
+      }
+      if (cai.id == adolecente.cai.id) {
+        return new ResultWithData<Traslado>(
+          false,
+          'No puedes generar un traslado si el adolecente ya esta ahi',
+          null,
+        );
       }
       traslado.cai = cai!;
       adolecente.cai = cai!;
