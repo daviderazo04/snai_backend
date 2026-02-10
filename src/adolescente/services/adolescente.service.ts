@@ -8,10 +8,17 @@ import { EstadoCivil } from 'src/parametros/entities/estadoCivil';
 import { Gdos } from 'src/parametros/entities/gdos';
 import { Etnia } from 'src/parametros/entities/etnia.entity';
 import { Canton } from 'src/localidades/entities/canton.entity';
+import { Traslado } from 'src/localidades/entities/traslado.entity';
 import { ResultWithData, SimpleResult } from 'src/common/dto/result.dto';
 import { AdolescentePayloadDto } from '../dto/adolescente.payload.dto';
 import { PaginatedResult } from 'src/common/dto/paginated.result.dto';
 import { Estado } from 'src/common/enums/estado.enum';
+import { RepInfractor } from '../entities/repInfractor.entity';
+import { Juridico } from 'src/info-adolescente/entities/juridico.entity';
+import { Ocupacion } from 'src/info-adolescente/entities/ocupacion.entity';
+import { Familia } from 'src/info-adolescente/entities/familia.entity';
+import { Salud } from 'src/info-adolescente/entities/salud.entity';
+import { Educa } from 'src/info-adolescente/entities/educa.entity';
 
 @Injectable()
 export class AdolescenteService {
@@ -30,6 +37,20 @@ export class AdolescenteService {
     private readonly etniaRepository: Repository<Etnia>,
     @InjectRepository(Canton)
     private readonly cantonRepository: Repository<Canton>,
+    @InjectRepository(RepInfractor)
+    private readonly repInfractorRepository: Repository<RepInfractor>,
+    @InjectRepository(Juridico)
+    private readonly juridicoRepository: Repository<Juridico>,
+    @InjectRepository(Ocupacion)
+    private readonly ocupacionRepository: Repository<Ocupacion>,
+    @InjectRepository(Familia)
+    private readonly familiaRepository: Repository<Familia>,
+    @InjectRepository(Salud)
+    private readonly saludRepository: Repository<Salud>,
+    @InjectRepository(Educa)
+    private readonly educaRepository: Repository<Educa>,
+    @InjectRepository(Traslado)
+    private readonly trasladoRepository: Repository<Traslado>,
   ) {}
 
   async createAdolescente(
@@ -250,6 +271,56 @@ export class AdolescenteService {
           false,
           'No existe el adolescente con el id ingresado',
         );
+
+      const [
+        repInfractorCount,
+        juridicoCount,
+        ocupacionCount,
+        familiaCount,
+        saludActivaCount,
+        educaActivaCount,
+        trasladoActivoCount,
+      ] = await Promise.all([
+        this.repInfractorRepository.count({
+          where: { adolescente: { id } },
+        }),
+        this.juridicoRepository.count({
+          where: { adolescente: { id } },
+        }),
+        this.ocupacionRepository.count({
+          where: { adolescente: { id } },
+        }),
+        this.familiaRepository.count({
+          where: { adolescente: { id } },
+        }),
+        this.saludRepository.count({
+          where: { adolescente: { id }, estado: Estado.ACTIVO },
+        }),
+        this.educaRepository.count({
+          where: { adolescente: { id }, estado: Estado.ACTIVO },
+        }),
+        this.trasladoRepository.count({
+          where: { adolecente: { id }, estado: Estado.ACTIVO },
+        }),
+      ]);
+
+      const bloqueos: string[] = [];
+      if (repInfractorCount > 0) bloqueos.push('rep-infractores');
+      if (juridicoCount > 0) bloqueos.push('juridico');
+      if (ocupacionCount > 0) bloqueos.push('ocupacion');
+      if (familiaCount > 0) bloqueos.push('familia');
+      if (saludActivaCount > 0) bloqueos.push('salud activa');
+      if (educaActivaCount > 0) bloqueos.push('educacion activa');
+      if (trasladoActivoCount > 0) bloqueos.push('traslados activos');
+      if (bloqueos.length > 0) {
+        return new SimpleResult(
+          false,
+          `No se puede inactivar el adolescente porque tiene registros asociados: ${bloqueos.join(
+            ', ',
+          )}`,
+        );
+      }
+
       adolescente.estado = Estado.INACTIVO;
       await this.adolescenteRepository.save(adolescente);
       return new SimpleResult(true, 'Adolescente eliminado exitosamente');

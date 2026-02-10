@@ -5,12 +5,15 @@ import { Delito } from '../entities/delito.entity';
 import { DelitoDto } from '../dto/delito.dto';
 import { ResultWithData } from 'src/common/dto/result.dto';
 import { PaginatedResult } from 'src/common/dto/paginated.result.dto';
+import { Juridico } from '../entities/juridico.entity';
 
 @Injectable()
 export class DelitoService {
   constructor(
     @InjectRepository(Delito)
     private readonly delitoRepository: Repository<Delito>,
+    @InjectRepository(Juridico)
+    private readonly juridicoRepository: Repository<Juridico>,
   ) {}
 
   async create(delitoDto: DelitoDto): Promise<ResultWithData<Delito>> {
@@ -130,6 +133,17 @@ export class DelitoService {
         false, // success: false
         `El delito con ID ${id} no fue encontrado`, // message
         false, // data: false
+      );
+    }
+
+    const juridicoCount = await this.juridicoRepository.count({
+      where: { delito: { id } },
+    });
+    if (juridicoCount > 0) {
+      return new ResultWithData<boolean>(
+        false,
+        'No se puede eliminar el delito porque tiene registros asociados',
+        false,
       );
     }
 

@@ -8,6 +8,7 @@ import { Canton } from 'src/localidades/entities/canton.entity';
 import { RepresentantePayloadDto } from '../dto/representante.payload.dto';
 import { ResultWithData, SimpleResult } from 'src/common/dto/result.dto';
 import { PaginatedResult } from 'src/common/dto/paginated.result.dto';
+import { RepInfractor } from '../entities/repInfractor.entity';
 
 @Injectable()
 export class RepresentanteService {
@@ -20,6 +21,8 @@ export class RepresentanteService {
     private readonly parentescoRepository: Repository<Parentesco>,
     @InjectRepository(Canton)
     private readonly cantonRepository: Repository<Canton>,
+    @InjectRepository(RepInfractor)
+    private readonly repInfractorRepository: Repository<RepInfractor>,
   ) {}
 
   async createRepresentante(
@@ -171,6 +174,15 @@ export class RepresentanteService {
           false,
           'No existe el representante con el id ingresado',
         );
+      const repInfractorCount = await this.repInfractorRepository.count({
+        where: { representante: { id } },
+      });
+      if (repInfractorCount > 0) {
+        return new SimpleResult(
+          false,
+          'No se puede eliminar el representante porque tiene registros asociados',
+        );
+      }
       await this.representanteRepository.remove(representante);
       return new SimpleResult(true, 'Representante eliminado exitosamente');
     } catch (error) {

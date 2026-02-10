@@ -12,6 +12,7 @@ describe('RepresentanteService', () => {
   let nacionalidadRepository: { findOneBy: jest.Mock };
   let parentescoRepository: { findOneBy: jest.Mock };
   let cantonRepository: { findOneBy: jest.Mock };
+  let repInfractorRepository: { count: jest.Mock };
 
   const buildPayload = () => ({
     nacionalidadId: 1,
@@ -33,13 +34,17 @@ describe('RepresentanteService', () => {
     nacionalidadRepository = { findOneBy: jest.fn() };
     parentescoRepository = { findOneBy: jest.fn() };
     cantonRepository = { findOneBy: jest.fn() };
+    repInfractorRepository = { count: jest.fn() };
 
     service = new RepresentanteService(
       representanteRepository as any,
       nacionalidadRepository as any,
       parentescoRepository as any,
       cantonRepository as any,
+      repInfractorRepository as any,
     );
+
+    repInfractorRepository.count.mockResolvedValue(0);
   });
 
   it('createRepresentante returns success when relations exist', async () => {
@@ -131,5 +136,16 @@ describe('RepresentanteService', () => {
 
     expect(result.success).toBe(true);
     expect(representanteRepository.remove).toHaveBeenCalledWith(representante);
+  });
+
+  it('deleteRepresentante returns failure when has related records', async () => {
+    const representante = { id: 1 };
+    representanteRepository.findOneBy.mockResolvedValue(representante);
+    repInfractorRepository.count.mockResolvedValue(2);
+
+    const result = await service.deleteRepresentante(1);
+
+    expect(result.success).toBe(false);
+    expect(representanteRepository.remove).not.toHaveBeenCalled();
   });
 });

@@ -17,6 +17,12 @@ import { Parentesco } from 'src/parametros/entities/parentesco.entity';
 import { RepInfractor } from './entities/repInfractor.entity';
 import { RepresentanteService } from './services/representante.service';
 import { RepInfractorService } from './services/repInfractor.service';
+import { Juridico } from 'src/info-adolescente/entities/juridico.entity';
+import { Ocupacion } from 'src/info-adolescente/entities/ocupacion.entity';
+import { Familia } from 'src/info-adolescente/entities/familia.entity';
+import { Salud } from 'src/info-adolescente/entities/salud.entity';
+import { Educa } from 'src/info-adolescente/entities/educa.entity';
+import { Traslado } from 'src/localidades/entities/traslado.entity';
 
 @Module({
   imports: [
@@ -32,6 +38,12 @@ import { RepInfractorService } from './services/repInfractor.service';
       Representante,
       Parentesco,
       RepInfractor,
+      Juridico,
+      Ocupacion,
+      Familia,
+      Salud,
+      Educa,
+      Traslado,
     ]),
   ],
   controllers: [

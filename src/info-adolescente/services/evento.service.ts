@@ -5,12 +5,15 @@ import { Evento } from '../entities/evento.entity'; // Asegúrate de la ruta
 import { EventoDto } from '../dto/evento.dto';
 import { ResultWithData } from 'src/common/dto/result.dto';
 import { PaginatedResult } from 'src/common/dto/paginated.result.dto';
+import { Familia } from '../entities/familia.entity';
 
 @Injectable()
 export class EventoService {
   constructor(
     @InjectRepository(Evento)
     private readonly eventoRepository: Repository<Evento>,
+    @InjectRepository(Familia)
+    private readonly familiaRepository: Repository<Familia>,
   ) {}
 
   async create(eventoDto: EventoDto): Promise<ResultWithData<Evento>> {
@@ -140,6 +143,17 @@ export class EventoService {
         false,
         `El evento con ID ${id} no fue encontrado`,
         null,
+      );
+    }
+
+    const familiaCount = await this.familiaRepository.count({
+      where: { evento: { id } },
+    });
+    if (familiaCount > 0) {
+      return new ResultWithData<boolean>(
+        false,
+        'No se puede eliminar el evento porque tiene registros asociados',
+        false,
       );
     }
 

@@ -14,6 +14,13 @@ describe('AdolescenteService', () => {
   let gdosRepository: { findOneBy: jest.Mock };
   let etniaRepository: { findOneBy: jest.Mock };
   let cantonRepository: { findOneBy: jest.Mock };
+  let repInfractorRepository: { count: jest.Mock };
+  let juridicoRepository: { count: jest.Mock };
+  let ocupacionRepository: { count: jest.Mock };
+  let familiaRepository: { count: jest.Mock };
+  let saludRepository: { count: jest.Mock };
+  let educaRepository: { count: jest.Mock };
+  let trasladoRepository: { count: jest.Mock };
 
   const buildPayload = () => ({
     caiId: 1,
@@ -46,6 +53,13 @@ describe('AdolescenteService', () => {
     gdosRepository = { findOneBy: jest.fn() };
     etniaRepository = { findOneBy: jest.fn() };
     cantonRepository = { findOneBy: jest.fn() };
+    repInfractorRepository = { count: jest.fn() };
+    juridicoRepository = { count: jest.fn() };
+    ocupacionRepository = { count: jest.fn() };
+    familiaRepository = { count: jest.fn() };
+    saludRepository = { count: jest.fn() };
+    educaRepository = { count: jest.fn() };
+    trasladoRepository = { count: jest.fn() };
 
     service = new AdolescenteService(
       adolescenteRepository as any,
@@ -55,7 +69,22 @@ describe('AdolescenteService', () => {
       gdosRepository as any,
       etniaRepository as any,
       cantonRepository as any,
+      repInfractorRepository as any,
+      juridicoRepository as any,
+      ocupacionRepository as any,
+      familiaRepository as any,
+      saludRepository as any,
+      educaRepository as any,
+      trasladoRepository as any,
     );
+
+    repInfractorRepository.count.mockResolvedValue(0);
+    juridicoRepository.count.mockResolvedValue(0);
+    ocupacionRepository.count.mockResolvedValue(0);
+    familiaRepository.count.mockResolvedValue(0);
+    saludRepository.count.mockResolvedValue(0);
+    educaRepository.count.mockResolvedValue(0);
+    trasladoRepository.count.mockResolvedValue(0);
   });
 
   it('createAdolescente returns success when relations exist', async () => {
@@ -159,5 +188,16 @@ describe('AdolescenteService', () => {
 
     expect(result.success).toBe(true);
     expect(adolescenteRepository.save).toHaveBeenCalledWith(adolescente);
+  });
+
+  it('softDeleteAdolescente returns failure when has related records', async () => {
+    const adolescente = { id: 1 };
+    adolescenteRepository.findOneBy.mockResolvedValue(adolescente);
+    repInfractorRepository.count.mockResolvedValue(1);
+
+    const result = await service.softDeleteAdolescente(1);
+
+    expect(result.success).toBe(false);
+    expect(adolescenteRepository.save).not.toHaveBeenCalled();
   });
 });
