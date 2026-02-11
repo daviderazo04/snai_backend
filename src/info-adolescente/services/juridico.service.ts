@@ -182,8 +182,13 @@ export class JuridicoService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { adolescenteId, delitoId, ...datosAActualizar } = updateJuridicoDto;
 
+    if (datosAActualizar.casacionRecurso === 'N') {
+      datosAActualizar.casacionFecha = null;
+    }
+
     // TypeORM merge actualiza las propiedades simples del objeto juridico con lo que venga en datosAActualizar
-    this.juridicoRepository.merge(juridico, datosAActualizar);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    this.juridicoRepository.merge(juridico, datosAActualizar as any);
 
     // 4. Guardar cambios
     const juridicoActualizado = await this.juridicoRepository.save(juridico);
