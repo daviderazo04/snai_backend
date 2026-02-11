@@ -75,7 +75,10 @@ export class CaiService {
     payload: PutLocalidadesDto,
   ): Promise<ResultWithData<Cai>> {
     try {
-      const cai = await this.caiRepository.findOneBy({ id: id });
+      const cai = await this.caiRepository.findOne({
+        where: { id: id },
+        relations: ['canton', 'canton.provincia'],
+      });
       if (!cai) throw new Error('Cai no encontrado');
       cai.nombre = payload.nombre;
       const savedCai = await this.caiRepository.save(cai);

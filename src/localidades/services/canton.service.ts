@@ -69,7 +69,10 @@ export class CantonService {
     payload: PutLocalidadesDto,
   ): Promise<ResultWithData<Canton>> {
     try {
-      const canton = await this.cantonRepository.findOneBy({ id: id });
+      const canton = await this.cantonRepository.findOne({
+        where: { id: id },
+        relations: ['provincia'],
+      });
       if (!canton) throw new Error('Provincia no encontrada');
       canton.nombre = payload.nombre;
       const savedCanton = await this.cantonRepository.save(canton);
