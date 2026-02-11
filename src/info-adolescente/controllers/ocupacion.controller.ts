@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  Patch,
   // Delete,
 } from '@nestjs/common';
 import {
@@ -140,7 +141,7 @@ export class OcupacionController {
     return await this.ocupacionService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({
     summary: 'Actualizar una Ocupación',
     description: 'Actualiza los datos de una ocupación existente.',
