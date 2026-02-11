@@ -121,7 +121,6 @@ export class AdolescentePayloadDto {
     description: 'Observaciones',
     example: 'El adolescente presenta comportamiento...',
   })
-  @IsNotEmpty()
   @IsString()
-  observaciones: string;
+  observaciones: string = '';
 }
