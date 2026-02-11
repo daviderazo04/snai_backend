@@ -146,12 +146,6 @@ export class AdolescenteService {
         'gdos',
         'etnia',
         'canton',
-        'juridico',
-        'ocupacion',
-        'familia',
-        'traslados',
-        'salud',
-        'educa',
       ],
     });
     if (!adolecente) {
