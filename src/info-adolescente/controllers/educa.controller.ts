@@ -80,8 +80,9 @@ export class EducaController {
   async getEduca(
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
+    @Query('adolescenteId') adolescenteId?: number,
   ): Promise<PaginatedResult<Educa>> {
-    return this.educaService.getEducaPaginado(page, size);
+    return this.educaService.getEducaPaginado(page, size, adolescenteId);
   }
 
   @Patch('/:id')

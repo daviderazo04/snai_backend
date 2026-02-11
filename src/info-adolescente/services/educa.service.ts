@@ -59,10 +59,13 @@ export class EducaService {
   async getEducaPaginado(
     page: number = 1,
     size: number = 10,
+    adolescenteId: number | undefined,
   ): Promise<PaginatedResult<Educa>> {
     const skip = (page - 1) * size;
+    const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
+    if (adolescenteId != undefined) where.adolecente = { id: adolescenteId };
     const [data, total] = await this.educaRepository.findAndCount({
-      where: { estado: Equal(Estado.ACTIVO) },
+      where,
       take: size,
       skip,
       relations: ['adolescente'],
@@ -80,7 +83,11 @@ export class EducaService {
     try {
       const educa = await this.educaRepository.findOneBy({ id });
       if (!educa) {
-        return new ResultWithData<Educa>(false, 'No existe el registro educativo', null);
+        return new ResultWithData<Educa>(
+          false,
+          'No existe el registro educativo',
+          null,
+        );
       }
 
       const adolescente = await this.adolescenteRepository.findOneBy({
@@ -88,7 +95,11 @@ export class EducaService {
       });
 
       if (!adolescente) {
-        return new ResultWithData<Educa>(false, 'Adolescente no encontrado', null);
+        return new ResultWithData<Educa>(
+          false,
+          'Adolescente no encontrado',
+          null,
+        );
       }
 
       // Actualización de campos
@@ -105,7 +116,11 @@ export class EducaService {
       educa.adolescente = adolescente;
 
       const saved = await this.educaRepository.save(educa);
-      return new ResultWithData<Educa>(true, 'Registro actualizado correctamente', saved);
+      return new ResultWithData<Educa>(
+        true,
+        'Registro actualizado correctamente',
+        saved,
+      );
     } catch (error) {
       return new ResultWithData<Educa>(false, (error as Error).message, null);
     }
@@ -119,7 +134,10 @@ export class EducaService {
       }
       educa.estado = Estado.INACTIVO;
       await this.educaRepository.save(educa);
-      return new SimpleResult(true, 'Registro educativo eliminado exitosamente');
+      return new SimpleResult(
+        true,
+        'Registro educativo eliminado exitosamente',
+      );
     } catch (error) {
       return new SimpleResult(false, (error as Error).message);
     }
