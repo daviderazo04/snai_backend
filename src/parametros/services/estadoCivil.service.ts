@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, ILike, Like, Repository } from 'typeorm';
+import { Equal, ILike, Repository } from 'typeorm';
 import { EstadoCivil } from '../entities/estadoCivil';
 import { ParamPayload } from '../dto/param.payload';
 import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
@@ -31,7 +31,7 @@ export class EstadoCivilService {
       const [estadoCivils, totales] =
         await this.estadoCivilRepository.findAndCount({
           where: {
-            nombre: Like(`%${nombre}%`),
+            nombre: ILike(`%${nombre}%`),
             estado: Equal(Estado.ACTIVO),
           },
           take: size,

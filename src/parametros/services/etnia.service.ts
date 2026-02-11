@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, ILike, Repository } from 'typeorm';
 import { Etnia } from '../entities/etnia.entity';
 import { ParamPayload } from '../dto/param.payload';
 import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
@@ -28,7 +28,7 @@ export class EtniaService {
       return new PaginatedResult(etnias, totalPages, page, size);
     } else {
       const [etnias, totales] = await this.etniaRepository.findAndCount({
-        where: { nombre: nombre, estado: Equal(Estado.ACTIVO) },
+        where: { nombre: ILike(`%${nombre}%`), estado: Equal(Estado.ACTIVO) },
         take: size,
         skip: (page - 1) * size,
       });

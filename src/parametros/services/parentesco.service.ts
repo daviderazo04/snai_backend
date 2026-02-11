@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, ILike, Repository } from 'typeorm';
 import { Parentesco } from '../entities/parentesco.entity';
 import { ParamPayload } from '../dto/param.payload';
 import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
@@ -30,7 +30,7 @@ export class ParentescoService {
     } else {
       const [parentescos, totales] =
         await this.parentescoRepository.findAndCount({
-          where: { nombre: nombre, estado: Equal(Estado.ACTIVO) },
+          where: { nombre: ILike(`%${nombre}%`), estado: Equal(Estado.ACTIVO) },
           take: size,
           skip: (page - 1) * size,
         });
