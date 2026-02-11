@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Put,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -119,7 +120,7 @@ export class DelitoController {
     return await this.delitoService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({
     summary: 'Actualizar un Delito',
     description: 'Actualiza los datos de un delito existente.',
