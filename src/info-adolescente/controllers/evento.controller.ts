@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -120,7 +121,7 @@ export class EventoController {
     return await this.eventoService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({
     summary: 'Actualizar un Evento',
     description: 'Actualiza el nombre de un evento existente.',
