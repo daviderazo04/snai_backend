@@ -161,6 +161,7 @@ export class CreateJuridicoDto {
   @ApiProperty({
     description: 'Recurso de casación (1 caracter)',
     maxLength: 1,
+    example: 'S',
   })
   @IsString()
   @MaxLength(1)
