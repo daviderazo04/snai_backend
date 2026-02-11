@@ -31,7 +31,7 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Canton } from '../entities/canton.entity';
 import { Provincia } from '../entities/provincia.entity';
 import { Auditar } from '../../auditoria/decorators/auditar.decorator';
-import { PutLocalidadesDto } from '../dto/put.localidades.dto';
+import { PutCaiDto, PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('CAI')
 @ApiExtraModels(ResultWithData, PaginatedResult, Cai, Canton, Provincia)
@@ -131,7 +131,7 @@ export class CaiController {
   })
   @Auditar(Cai)
   async updateCai(
-    @Body() payload: PutLocalidadesDto,
+    @Body() payload: PutCaiDto,
     @Param('id') id: number,
   ): Promise<ResultWithData<Cai>> {
     return await this.caiService.editCai(id, payload);

@@ -8,7 +8,7 @@ import { CaiPayloadDto } from '../dto/cai.payload.dto';
 import { ResultWithData, SimpleResult } from '../../common/dto/result.dto';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Estado } from '../../common/enums/estado.enum';
-import { PutLocalidadesDto } from '../dto/put.localidades.dto';
+import { PutCaiDto, PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @Injectable()
 export class CaiService {
@@ -70,10 +70,7 @@ export class CaiService {
       return new ResultWithData<Cai>(false, err.message, null);
     }
   }
-  async editCai(
-    id: number,
-    payload: PutLocalidadesDto,
-  ): Promise<ResultWithData<Cai>> {
+  async editCai(id: number, payload: PutCaiDto): Promise<ResultWithData<Cai>> {
     try {
       const cai = await this.caiRepository.findOne({
         where: { id: id },
@@ -81,6 +78,15 @@ export class CaiService {
       });
       if (!cai) throw new Error('Cai no encontrado');
       cai.nombre = payload.nombre;
+      if (payload.cantonId != undefined) {
+        const canton = await this.cantonRepository.findOne({
+          where: { id: payload.cantonId },
+        });
+        if (!canton) {
+          throw new Error('Canton no encontrado');
+        }
+        cai.canton = canton;
+      }
       const savedCai = await this.caiRepository.save(cai);
       return new ResultWithData<Cai>(
         true,
