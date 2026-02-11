@@ -60,8 +60,8 @@ export class RolesService {
       const endpoint = p.endpoint;
       return new PermisoFlatResponseDto(
         endpoint?.endpoint ?? '',
-        p.EDIT,
         p.VIEW,
+        p.EDIT,
         endpoint?.descripcion ?? '',
       );
     });
