@@ -17,6 +17,7 @@ import {
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -62,7 +63,23 @@ export class AdolescentesController {
   ): Promise<ResultWithData<Adolescente>> {
     return this.adolescenteService.createAdolescente(payload);
   }
-
+  @Get('/:id')
+  @ApiOperation({ summary: 'Obtener un adolescente por id' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del adolescente' })
+  @ApiOkResponse({
+    description: 'Adolescente encontrado',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        { properties: { data: { $ref: getSchemaPath(Adolescente) } } },
+      ],
+    },
+  })
+  async getAdolcenteById(
+    @Param('id') id: number,
+  ): Promise<ResultWithData<Adolescente>> {
+    return this.adolescenteService.getAdolcenteById(id);
+  }
   @Get()
   @ApiOperation({ summary: 'Listar adolescentes paginados' })
   @ApiQuery({ name: 'nombre', required: false, type: String })

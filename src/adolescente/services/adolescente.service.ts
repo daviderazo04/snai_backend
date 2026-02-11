@@ -136,7 +136,37 @@ export class AdolescenteService {
       );
     }
   }
-
+  async getAdolcenteById(id: number): Promise<ResultWithData<Adolescente>> {
+    const adolecente = await this.adolescenteRepository.findOne({
+      where: { id: id },
+      relations: [
+        'cai',
+        'nacionalidad',
+        'estadoCivil',
+        'gdos',
+        'etnia',
+        'canton',
+        'juridico',
+        'ocupacion',
+        'familia',
+        'traslados',
+        'salud',
+        'educa',
+      ],
+    });
+    if (!adolecente) {
+      return new ResultWithData<Adolescente>(
+        false,
+        'No existe el CAI con el id ingresado',
+        null,
+      );
+    }
+    return new ResultWithData<Adolescente>(
+      true,
+      'Adolescente consulado',
+      adolecente,
+    );
+  }
   async getAdolescentes(
     nombre: string = '',
     cedula: string = '',
