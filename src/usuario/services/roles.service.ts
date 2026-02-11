@@ -83,7 +83,10 @@ export class RolesService {
   ): Promise<ResultWithData<Perfil>> {
     const result = await this.dataSource.transaction(async (manager) => {
       try {
-        const actualPerfil = await manager.findOneBy(Perfil, { id });
+        const actualPerfil = await manager.findOne(Perfil, {
+          where: { id },
+          relations: ['permisos', 'permisos.endpoint'],
+        });
         if (!actualPerfil) {
           throw new Error(`Perfil con ID ${id} no encontrado`);
         }
@@ -94,20 +97,51 @@ export class RolesService {
           actualPerfil.descripcion = payload.descripcion;
         }
         await manager.save(actualPerfil);
-        for (const permiso of payload.permisosEditados) {
-          const actualEndpoint = await manager.findOneBy(Endpoint, {
-            endpoint: permiso.endpoint,
-          });
+
+        const permisosEditados = payload.permisosEditados ?? [];
+        const endpoints = await manager.find(Endpoint);
+        const endpointMap = new Map(endpoints.map((e) => [e.endpoint, e]));
+
+        const permisosUnicos = new Map<string, Permiso>();
+        const permisosDuplicados: Permiso[] = [];
+        for (const permiso of actualPerfil.permisos ?? []) {
+          const key = permiso.endpoint?.endpoint;
+          if (!key) continue;
+          if (permisosUnicos.has(key)) {
+            permisosDuplicados.push(permiso);
+          } else {
+            permisosUnicos.set(key, permiso);
+          }
+        }
+
+        if (permisosDuplicados.length > 0) {
+          await manager.delete(
+            Permiso,
+            permisosDuplicados.map((p) => p.id),
+          );
+        }
+
+        for (const permiso of permisosEditados) {
+          const actualEndpoint = endpointMap.get(permiso.endpoint);
           if (!actualEndpoint) {
             throw new Error(`Endpoint ${permiso.endpoint} no encontrado`);
           }
-          const nuevoPermiso = manager.create(Permiso, {
-            endpoint: actualEndpoint,
-            perfil: actualPerfil,
-            EDIT: permiso.EDIT,
-            VIEW: permiso.VIEW,
-          });
-          await manager.save(nuevoPermiso);
+
+          const permisoExistente = permisosUnicos.get(actualEndpoint.endpoint);
+          if (permisoExistente) {
+            permisoExistente.EDIT = permiso.EDIT;
+            permisoExistente.VIEW = permiso.VIEW;
+            await manager.save(permisoExistente);
+          } else {
+            const nuevoPermiso = manager.create(Permiso, {
+              endpoint: actualEndpoint,
+              perfil: actualPerfil,
+              EDIT: permiso.EDIT,
+              VIEW: permiso.VIEW,
+            });
+            await manager.save(nuevoPermiso);
+            permisosUnicos.set(actualEndpoint.endpoint, nuevoPermiso);
+          }
         }
         return new ResultWithData<Perfil>(
           true,
