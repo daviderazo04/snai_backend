@@ -12,10 +12,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -31,6 +33,7 @@ import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 import { Gdos } from '../entities/gdos';
 
 @ApiTags('Nacionalidad')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Nacionalidad)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('nacionalidad')
@@ -97,6 +100,7 @@ export class NacionalidadController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID de la nacionalidad' })
   @ApiOperation({
     summary: 'Eliminar una nacionalidad',
   })
@@ -109,6 +113,7 @@ export class NacionalidadController {
     return await this.nacionalidadService.softDeleteNacionalidad(id);
   }
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID de la nacionalidad' })
   @ApiOperation({
     summary: 'Editar una nacionalidad',
   })

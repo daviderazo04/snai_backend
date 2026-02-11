@@ -13,6 +13,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
@@ -31,6 +32,7 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Jurídico')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Juridico)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('juridico')

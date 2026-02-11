@@ -13,10 +13,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -34,6 +36,7 @@ import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 import { PutCaiDto, PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('CAI')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Cai, Canton, Provincia)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('cai')
@@ -100,6 +103,7 @@ export class CaiController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del CAI' })
   @ApiOkResponse({
     description: 'Resultado de la operacion',
     schema: { $ref: getSchemaPath(SimpleResult) },
@@ -109,11 +113,12 @@ export class CaiController {
     description: 'Elimina un CAI por su id',
   })
   @Auditar(Cai)
-  async deleteCai(@Query('id') id: number): Promise<SimpleResult> {
+  async deleteCai(@Param('id') id: number): Promise<SimpleResult> {
     return await this.caiService.softDeleteCai(id);
   }
 
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del CAI' })
   @ApiOperation({ summary: 'Actualizar un CAI por id' })
   @ApiBody({ type: PutLocalidadesDto })
   @ApiOkResponse({

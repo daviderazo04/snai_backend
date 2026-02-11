@@ -15,10 +15,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -38,6 +40,7 @@ import { Canton } from '../entities/canton.entity';
 import { PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('Provincias')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Provincia)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('provincias')
@@ -105,20 +108,22 @@ export class ProvinciasController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID de la provincia' })
   @ApiOkResponse({
     description: 'Resultado de la operacion',
     schema: { $ref: getSchemaPath(SimpleResult) },
   })
   @ApiOperation({
-    summary: 'Eliminar un Canton por id',
-    description: 'Elimina un Canton por su id',
+    summary: 'Eliminar una provincia por id',
+    description: 'Elimina una provincia por su id',
   })
-  async deleteProvincia(@Query('id') id: number): Promise<SimpleResult> {
+  async deleteProvincia(@Param('id') id: number): Promise<SimpleResult> {
     return await this.provinciaService.softDeleteProvincia(id);
   }
   @Auditar(Provincia)
   @Patch('/:id')
-  @ApiOperation({ summary: 'Actualizar un canton por id' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID de la provincia' })
+  @ApiOperation({ summary: 'Actualizar una provincia por id' })
   @ApiBody({ type: PutLocalidadesDto })
   @ApiOkResponse({
     description: 'Provincia actualizado correctamente',

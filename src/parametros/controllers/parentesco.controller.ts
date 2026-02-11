@@ -12,10 +12,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -31,6 +33,7 @@ import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 import { Nacionalidad } from '../entities/nacionalidad.entity';
 
 @ApiTags('Parentesco')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Parentesco)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('parentesco')
@@ -97,6 +100,7 @@ export class ParentescoController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del parentesco' })
   @ApiOperation({
     summary: 'Eliminar un parentesco',
   })
@@ -109,6 +113,7 @@ export class ParentescoController {
     return await this.parentescoService.softDeleteParentesco(id);
   }
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del parentesco' })
   @ApiOperation({
     summary: 'Editar un parentesco',
   })

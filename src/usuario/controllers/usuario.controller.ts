@@ -9,11 +9,13 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
   ApiOkResponse,
   ApiParam,
   ApiQuery,
+  ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { Usuario } from '../entities/usuario.entity';
@@ -29,6 +31,8 @@ import {
   PermisoFlatResponseDto,
   UsuarioWithPerfilFlatResponseDto,
 } from '../dto/permiso.flat.response.dto';
+@ApiTags('Usuario')
+@ApiBearerAuth('jwt-auth')
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('usuario')
 export class UsuarioController {
@@ -37,6 +41,11 @@ export class UsuarioController {
     private readonly rolesService: RolesService,
   ) {}
   @Post('/perfil/:id')
+  @ApiOperation({
+    summary: 'Asignar un perfil a un usuario',
+    description:
+      'Asocia un perfil existente a un usuario específico y devuelve el resultado de la operación.',
+  })
   @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
   @ApiBody({ type: PerfilAsignarPayload })
   @ApiOkResponse({
@@ -51,6 +60,11 @@ export class UsuarioController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Listar usuarios paginados',
+    description:
+      'Devuelve los usuarios sanitizados con filtros opcionales por nombre.',
+  })
   @ApiExtraModels(Usuario, PaginatedResult)
   @ApiQuery({ name: 'nombre', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })

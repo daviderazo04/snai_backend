@@ -13,10 +13,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -33,6 +35,7 @@ import { Cai } from '../entities/cai.entity';
 import { PutLocalidadesDto } from '../dto/put.localidades.dto';
 
 @ApiTags('Cantones')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Canton)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('cantones')
@@ -95,6 +98,7 @@ export class CantonesController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del cantón' })
   @ApiOkResponse({
     description: 'Resultado de la operacion',
     schema: { $ref: getSchemaPath(SimpleResult) },
@@ -104,11 +108,12 @@ export class CantonesController {
     description: 'Elimina un Canton por su id',
   })
   @Auditar(Canton)
-  async deleteCanton(@Query('id') id: number): Promise<SimpleResult> {
+  async deleteCanton(@Param('id') id: number): Promise<SimpleResult> {
     return await this.cantonService.softDeleteCaton(id);
   }
 
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del cantón' })
   @ApiOperation({ summary: 'Actualizar un canton por id' })
   @ApiBody({ type: PutLocalidadesDto })
   @ApiOkResponse({

@@ -31,9 +31,18 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = new DocumentBuilder()
     .setTitle('Backend Snai')
-    .setDescription('BAckend del proyecto snai :v')
+    .setDescription('Backend del proyecto Snai')
     .setVersion('1.0')
     .addTag('back')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Ingrese el token JWT devuelto por /auth/login',
+      },
+      'jwt-auth',
+    )
     .build();
   const beforeInterceptor = app.get(AuditoriaBeforeInterceptor);
   const afterInterceptor = app.get(AuditoriaAfterInterceptor);

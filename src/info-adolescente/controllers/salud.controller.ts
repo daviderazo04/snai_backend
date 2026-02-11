@@ -13,6 +13,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
@@ -30,6 +31,7 @@ import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { SaludService } from '../services/salud.service';
 
 @ApiTags('Salud')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, SimpleResult, PaginatedResult, Salud)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('salud')

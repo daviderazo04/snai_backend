@@ -13,10 +13,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -31,6 +33,7 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Estado civil')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, EstadoCivil)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('estado-civil')
@@ -96,6 +99,7 @@ export class EstadoCivilController {
     );
   }
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del estado civil' })
   @ApiOperation({
     summary: 'Eliminar un estado civil',
   })
@@ -108,6 +112,7 @@ export class EstadoCivilController {
     return await this.estadoCivilService.softDeleteEstadoCivil(id);
   }
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del estado civil' })
   @ApiOperation({
     summary: 'Editar un estado civil',
   })

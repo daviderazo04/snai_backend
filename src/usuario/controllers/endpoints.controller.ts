@@ -11,7 +11,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 
 @ApiTags('Usuario')
-@ApiBearerAuth()
+@ApiBearerAuth('jwt-auth')
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('endpoints')
 export class EndpointsController {

@@ -12,10 +12,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -33,6 +35,7 @@ import { PaginatedResult } from '../../common/dto/paginated.result.dto';
 import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 
 @ApiTags('Traslados')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Traslado)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('traslados')
@@ -108,7 +111,9 @@ export class TrasladoController {
   async getTraslados(
     @Query('from') from?: string,
     @Query('to') to?: string,
-    @Query('page') page: number = 1,
+    @Query('adolescenteId') adolescenteId?: number,
+    @Query('page')
+    page: number = 1,
     @Query('size') size: number = 10,
   ) {
     const fromDate = from ? new Date(from) : null;
@@ -122,6 +127,7 @@ export class TrasladoController {
   }
 
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del traslado' })
   @ApiOperation({ summary: 'Actualizar un traslado por id' })
   @ApiBody({ type: TrasladoUpdatePayload })
   @ApiOkResponse({
@@ -146,6 +152,7 @@ export class TrasladoController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del traslado' })
   @ApiOperation({
     summary: 'Eliminar un traslado por id (Soft Delete)',
     description: 'Marca un traslado como inactivo por su id',

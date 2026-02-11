@@ -12,6 +12,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
@@ -29,6 +30,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
 
 @ApiTags('Representante')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, SimpleResult, PaginatedResult, Representante)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('representantes')

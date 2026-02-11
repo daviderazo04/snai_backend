@@ -13,6 +13,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
@@ -30,6 +31,7 @@ import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { EducaService } from '../services/educa.service';
 
 @ApiTags('Educación')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, SimpleResult, PaginatedResult, Educa)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('educacion')

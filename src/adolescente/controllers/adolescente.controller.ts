@@ -12,6 +12,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
@@ -29,6 +30,7 @@ import { PermisosGuard } from '../../common/guards/permisos.guard';
 import { AdolescenteService } from '../services/adolescente.service';
 
 @ApiTags('Adolescentes')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, SimpleResult, PaginatedResult, Adolescente)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('adolescentes')

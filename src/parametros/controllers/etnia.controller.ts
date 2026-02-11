@@ -12,10 +12,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -31,6 +33,7 @@ import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 import { EstadoCivil } from '../entities/estadoCivil';
 
 @ApiTags('Etnia')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Etnia)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('etnia')
@@ -93,6 +96,7 @@ export class EtniaController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID de la etnia' })
   @ApiOperation({
     summary: 'Eliminar un estado civil',
   })
@@ -105,6 +109,7 @@ export class EtniaController {
     return await this.etniaService.softDeleteEtnia(id);
   }
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID de la etnia' })
   @ApiOperation({
     summary: 'Editar una etnia',
   })

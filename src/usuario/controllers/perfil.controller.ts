@@ -13,12 +13,14 @@ import { PerfilPayloadDto } from '../dto/perfil.payload.dto';
 import { RolesService } from '../services/roles.service';
 import {
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
+  ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { ResultWithData } from '../../common/dto/result.dto';
@@ -33,6 +35,8 @@ import {
   PermisoFlatResponseDto,
 } from '../dto/permiso.flat.response.dto';
 
+@ApiTags('Perfiles')
+@ApiBearerAuth('jwt-auth')
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('perfil')
 export class PerfilController {
@@ -64,6 +68,7 @@ export class PerfilController {
   }
   @Patch('/:id')
   @ApiOperation({ summary: 'Editar perfil de usuario' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del perfil' })
   @ApiExtraModels(ResultWithData, Perfil)
   @ApiBody({ type: PerfilUpdatePayloadDto })
   @ApiOkResponse({
@@ -86,6 +91,10 @@ export class PerfilController {
     return await this.roleService.updatePerfil(id, payload);
   }
   @Get('')
+  @ApiOperation({
+    summary: 'Listar perfiles paginados',
+    description: 'Devuelve los perfiles con filtros opcionales por nombre.',
+  })
   @ApiExtraModels(Perfil, PaginatedResult)
   @ApiQuery({ name: 'nombre', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })

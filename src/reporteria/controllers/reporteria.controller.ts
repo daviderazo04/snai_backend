@@ -1,5 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ReportesDemograficosService } from '../services/reportes.demograficos.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermisosGuard } from '../../common/guards/permisos.guard';
@@ -7,6 +12,7 @@ import { ReportResult } from '../ReportResult';
 import { ReportMatrixResult } from '../report-matrix.result';
 
 @ApiTags('Reportería')
+@ApiBearerAuth('jwt-auth')
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('reporteria')
 export class ReporteriaController {

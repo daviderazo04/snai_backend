@@ -110,6 +110,7 @@ export class TrasladoService {
   async getPagiantedTraslados(
     from: Date | null,
     to: Date | null,
+    adolescenteId: number | null,
     page: number = 1,
     size: number = 10,
   ): Promise<PaginatedResult<Traslado>> {
@@ -117,6 +118,7 @@ export class TrasladoService {
     const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
     if (from) where.fecha = MoreThanOrEqual(from);
     if (to) where.fecha = MoreThanOrEqual(to);
+    if (adolescenteId) where.adolecente = { id: adolescenteId };
     const [traslados, total] = await this.trasladoRepository.findAndCount({
       where,
       take: size,

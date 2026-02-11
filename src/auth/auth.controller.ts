@@ -102,7 +102,7 @@ export class AuthController {
     description:
       'Recibe el ID de un perfil asignado al usuario, valida que tenga acceso y devuelve un JWT firmado con ese perfil activo y sus permisos',
   })
-  @ApiBearerAuth()
+  @ApiBearerAuth('jwt-auth')
   @ApiBody({ type: PerfilDto })
   @ApiOkResponse({
     description:
@@ -132,7 +132,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, PermisosGuard)
   @Get('profile')
   @ApiOperation({ summary: 'Obtener la información del usuario autenticado' })
-  @ApiBearerAuth()
+  @ApiBearerAuth('jwt-auth')
   @ApiOkResponse({
     description: 'Perfil obtenido correctamente',
     schema: {

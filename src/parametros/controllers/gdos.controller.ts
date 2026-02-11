@@ -12,10 +12,12 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -31,6 +33,7 @@ import { Auditar } from '../../auditoria/decorators/auditar.decorator';
 import { Etnia } from '../entities/etnia.entity';
 
 @ApiTags('Gdos')
+@ApiBearerAuth('jwt-auth')
 @ApiExtraModels(ResultWithData, PaginatedResult, Gdos)
 @UseGuards(JwtAuthGuard, PermisosGuard)
 @Controller('gdos')
@@ -93,6 +96,7 @@ export class GdosController {
   }
 
   @Delete('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del grado' })
   @ApiOperation({
     summary: 'Eliminar un  GDO',
   })
@@ -105,6 +109,7 @@ export class GdosController {
     return await this.gdosService.softDeleteGdos(id);
   }
   @Patch('/:id')
+  @ApiParam({ name: 'id', type: Number, description: 'ID del grado' })
   @ApiOperation({
     summary: 'Editar un gdo',
   })
