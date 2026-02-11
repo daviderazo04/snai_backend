@@ -121,6 +121,7 @@ export class TrasladoController {
     return await this.trasladoService.getPagiantedTraslados(
       fromDate,
       toDate,
+      adolescenteId,
       page,
       size,
     );
