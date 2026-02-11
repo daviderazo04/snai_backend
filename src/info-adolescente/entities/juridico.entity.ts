@@ -148,7 +148,7 @@ export class Juridico {
     type: String,
     format: 'date',
   })
-  @Column({ name: 'CasacionFecha', type: 'date' })
+  @Column({ name: 'CasacionFecha', type: 'date', nullable: true })
   casacionFecha: Date;
 
   @ApiProperty({

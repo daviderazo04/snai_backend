@@ -171,7 +171,7 @@ export class CreateJuridicoDto {
   @ApiProperty({ description: 'Fecha de casación' })
   @IsDateString()
   @IsOptional()
-  casacionFecha?: Date;
+  casacionFecha?: Date | null;
 
   // 23. Egreso Fecha
   @ApiProperty({ description: 'Fecha de egreso' })

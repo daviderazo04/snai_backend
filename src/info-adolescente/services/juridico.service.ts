@@ -50,12 +50,17 @@ export class JuridicoService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { adolescenteId, delitoId, ...datosJuridico } = createJuridicoDto;
 
+    // Si el recurso es 'N', forzamos la fecha a null
+    if (datosJuridico.casacionRecurso === 'N') {
+      datosJuridico.casacionFecha = null;
+    }
+
     // 4. Crear la entidad
     const nuevoJuridico = this.juridicoRepository.create({
       adolescente: adolescente,
       delito: delito,
       ...datosJuridico,
-    });
+    } as unknown as Juridico);
 
     const juridicoGuardado = await this.juridicoRepository.save(nuevoJuridico);
 
