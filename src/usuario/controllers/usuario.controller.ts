@@ -33,6 +33,8 @@ import {
   PermisoFlatResponseDto,
   UsuarioWithPerfilFlatResponseDto,
 } from '../dto/permiso.flat.response.dto';
+import { UpdateUsuarioInformacionDto } from '../dto/update-usuario.dto';
+import { UpdateUsuarioPasswordDto } from '../dto/update-usuario.dto';
 @ApiTags('Usuario')
 @ApiBearerAuth('jwt-auth')
 @UseGuards(JwtAuthGuard, PermisosGuard)
@@ -107,6 +109,62 @@ export class UsuarioController {
   })
   async resturar(@Param('id') id: number) {
     return await this.userService.restaurarUsuario(id);
+  }
+  @Patch('/informacion/:id')
+  @ApiOperation({
+    summary: 'Actualizar información básica de un usuario',
+    description:
+      'Actualiza datos personales (cedula, nombre, apellido, sexo, telefono, direccion y correo) y devuelve el registro actualizado.',
+  })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+  @ApiBody({ type: UpdateUsuarioInformacionDto })
+  @ApiExtraModels(ResultWithData, Usuario)
+  @ApiOkResponse({
+    description: 'Información actualizada correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Usuario) },
+          },
+        },
+      ],
+    },
+  })
+  async updateInformacion(
+    @Param('id') id: number,
+    @Body() payload: UpdateUsuarioInformacionDto,
+  ) {
+    return await this.userService.updateinfo(id, payload);
+  }
+  @Patch('/password/:id')
+  @ApiOperation({
+    summary: 'Actualizar contraseña de un usuario',
+    description:
+      'Actualiza la contraseña del usuario especificado y devuelve el registro actualizado.',
+  })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+  @ApiBody({ type: UpdateUsuarioPasswordDto })
+  @ApiExtraModels(ResultWithData, Usuario)
+  @ApiOkResponse({
+    description: 'Contraseña actualizada correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Usuario) },
+          },
+        },
+      ],
+    },
+  })
+  async updatePassword(
+    @Param('id') id: number,
+    @Body() payload: UpdateUsuarioPasswordDto,
+  ) {
+    return await this.userService.updatePassword(id, payload);
   }
   @Get()
   @ApiOperation({

@@ -11,6 +11,8 @@ export const ADMIN_TICS_ENDPOINTS = [
   '/usuario/perfil',
   '/usuario/detalle',
   '/usuario/reactivar',
+  '/usuario/informacion',
+  '/usuario/password',
   '/endpoints',
   '/perfil',
   '/perfil/detalle',

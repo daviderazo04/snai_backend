@@ -39,6 +39,14 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     descripcion: 'Capacidad de reactivar usuarios',
   },
   {
+    endpoint: '/usuario/informacion',
+    descripcion: 'Actualizacion de informacion de usuario',
+  },
+  {
+    endpoint: '/usuario/password',
+    descripcion: 'Actualizacion de contrasena de usuario',
+  },
+  {
     endpoint: '/endpoints',
     descripcion: 'Listado aplanado de endpoints disponibles',
   },

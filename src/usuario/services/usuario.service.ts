@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, Not, Repository } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
 import { RegisterPayloadDto } from '../../auth/dto/register.payload.dto';
 import { CryptService } from '../../common/crypt.service';
@@ -13,6 +13,11 @@ import {
 import { ResultWithData } from '../../common/dto/result.dto';
 import { RolesService } from './roles.service';
 import { Estado } from '../../common/enums/estado.enum';
+import {
+  UpdateUsuarioInformacionDto,
+  UpdateUsuarioPasswordDto,
+} from '../dto/update-usuario.dto';
+import { Sexo } from '../../common/enums/sexo.enums';
 
 @Injectable()
 export class UsuarioService {
@@ -40,6 +45,90 @@ export class UsuarioService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+  async updateinfo(
+    userId: number,
+    payload: UpdateUsuarioInformacionDto,
+  ): Promise<ResultWithData<Usuario | null>> {
+    const usuario = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!usuario) {
+      return new ResultWithData<Usuario | null>(
+        false,
+        'Usuario no encontrado',
+        null,
+      );
+    }
+
+    const cedulaOcupada = await this.userRepository.findOne({
+      where: { cedula: payload.cedula, id: Not(userId) },
+    });
+    if (cedulaOcupada) {
+      return new ResultWithData<Usuario | null>(
+        false,
+        'Cedula ya registrada en otro usuario',
+        null,
+      );
+    }
+
+    const correoOcupado = await this.userRepository.findOne({
+      where: { correo: payload.correo, id: Not(userId) },
+    });
+    if (correoOcupado) {
+      return new ResultWithData<Usuario | null>(
+        false,
+        'Correo ya registrado en otro usuario',
+        null,
+      );
+    }
+
+    const sexo =
+      payload.sexo === 'MASCULINO'
+        ? Sexo.MASCULINO
+        : payload.sexo === 'FEMENINO'
+          ? Sexo.FEMENINO
+          : null;
+    if (!sexo) {
+      return new ResultWithData<Usuario | null>(false, 'Sexo inválido', null);
+    }
+
+    usuario.cedula = payload.cedula;
+    usuario.correo = payload.correo;
+    usuario.nombre = payload.nombre;
+    usuario.apellido = payload.apellido;
+    usuario.sexo = sexo;
+    usuario.telefono = payload.telefono;
+    usuario.direccion = payload.direccion;
+
+    await this.userRepository.save(usuario);
+
+    const usuarioActualizado = await this.userRepository.findOne({
+      where: { id: userId },
+      select: [
+        'id',
+        'apellido',
+        'estado',
+        'nombre',
+        'correo',
+        'telefono',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+
+    return new ResultWithData<Usuario | null>(
+      true,
+      'Usuario actualizado correctamente',
+      usuarioActualizado,
+    );
+  }
+  async updatePassword(
+    userId: number,
+    payload: UpdateUsuarioPasswordDto,
+  ): Promise<ResultWithData<Usuario | null>> {
+    // TODO: implementar lógica de actualización de contraseña
+    return null as unknown as ResultWithData<Usuario | null>;
   }
   async verificarUsuarioActivo(userId: number): Promise<boolean> {
     const user = await this.userRepository.findOneBy({
