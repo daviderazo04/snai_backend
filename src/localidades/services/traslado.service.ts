@@ -111,6 +111,9 @@ export class TrasladoService {
     from: Date | null,
     to: Date | null,
     adolescenteId: number | undefined,
+    caiFromId: number | undefined,
+    caiToId: number | undefined,
+
     page: number = 1,
     size: number = 10,
   ): Promise<PaginatedResult<Traslado>> {
@@ -119,6 +122,8 @@ export class TrasladoService {
     if (from) where.fecha = MoreThanOrEqual(from);
     if (to) where.fecha = MoreThanOrEqual(to);
     if (adolescenteId != undefined) where.adolescente = { id: adolescenteId };
+    if (caiToId != undefined) where.cai = { id: caiToId };
+    if (caiFromId != undefined) where.fromCai = { id: caiFromId };
     const [traslados, total] = await this.trasladoRepository.findAndCount({
       where,
       take: size,

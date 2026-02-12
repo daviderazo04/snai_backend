@@ -76,14 +76,14 @@ export class TrasladoController {
       'Devuelve traslados de forma paginada, con opción de filtrar por rango de fechas.',
   })
   @ApiQuery({
-    name: 'from',
+    name: 'dateFrom',
     required: false,
     type: String,
     format: 'date',
     description: 'Fecha inicial',
   })
   @ApiQuery({
-    name: 'to',
+    name: 'dateTo',
     required: false,
     type: String,
     format: 'date',
@@ -92,6 +92,8 @@ export class TrasladoController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
   @ApiQuery({ name: 'adolescenteId', required: false, type: Number })
+  @ApiQuery({ name: 'caiFromId', required: false, type: Number })
+  @ApiQuery({ name: 'caiToId', required: false, type: Number })
   @ApiOkResponse({
     description: 'Listado paginado de traslados',
     schema: {
@@ -110,9 +112,12 @@ export class TrasladoController {
   })
   @Auditar(Traslado)
   async getTraslados(
-    @Query('from') from?: string,
-    @Query('to') to?: string,
+    @Query('dateFrom') from?: string,
+    @Query('dateTo') to?: string,
     @Query('adolescenteId') adolescenteId?: number,
+    @Query('caiFromId') caiFromId?: number,
+    @Query('caiToId') caiToId?: number,
+
     @Query('page')
     page: number = 1,
     @Query('size') size: number = 10,
@@ -123,6 +128,8 @@ export class TrasladoController {
       fromDate,
       toDate,
       adolescenteId,
+      caiFromId,
+      caiToId,
       page,
       size,
     );
