@@ -28,7 +28,7 @@ export class Traslado {
     type: () => Adolescente,
   })
   @ManyToOne(() => Adolescente, (adolescente) => adolescente.traslados)
-  adolescente: Adolescente;
+  adolecente: Adolescente;
 
   @ApiProperty({
     description: 'Fecha del traslado',
