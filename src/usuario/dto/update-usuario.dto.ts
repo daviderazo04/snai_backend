@@ -17,7 +17,7 @@ export class UpdateUsuarioInformacionDto {
   apellido: string;
 
   // Ajusta los valores permitidos según tu sistema (ej: 'M' | 'F' | 'OTRO')
-  @IsIn(['M', 'F', 'OTRO'], { message: 'sexo inválido' })
+  @IsIn(['MASCULINO', 'FEMENINO'], { message: 'sexo inválido' })
   sexo: string;
 
   // Ajusta la regla si manejas códigos de país, extensiones, etc.
