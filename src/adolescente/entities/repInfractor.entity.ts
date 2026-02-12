@@ -12,15 +12,24 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('repInfractor')
 export class RepInfractor {
+  @ApiProperty({ description: 'Identificador de la relación', example: 12 })
   @PrimaryGeneratedColumn({ name: 'repi_id' })
   id: number;
 
   // Muchas filas de 'repInfractor' pertenecen a un Adolescente
+  @ApiProperty({
+    description: 'Adolescente asociado a la relación',
+    type: () => Adolescente,
+  })
   @ManyToOne(() => Adolescente, (adolescente) => adolescente.repInfractores)
   @JoinColumn({ name: 'adlc_id' })
   adolescente: Adolescente;
 
   // Muchas filas de 'repInfractor' pertenecen a un Representante
+  @ApiProperty({
+    description: 'Representante legal asociado',
+    type: () => Representante,
+  })
   @ManyToOne(
     () => Representante,
     (representante) => representante.repInfractores,
