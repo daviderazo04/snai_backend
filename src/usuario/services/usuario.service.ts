@@ -229,6 +229,7 @@ export class UsuarioService {
           'correo',
           'estado',
           'telefono',
+          'direccion',
           'createdAt',
           'updatedAt',
         ],
@@ -247,6 +248,8 @@ export class UsuarioService {
           'correo',
           'estado',
           'telefono',
+          'direccion',
+
           'createdAt',
           'updatedAt',
         ],
