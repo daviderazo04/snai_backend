@@ -91,6 +91,7 @@ export class TrasladoController {
   })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
+  @ApiQuery({ name: 'adolescenteId', required: false, type: Number })
   @ApiOkResponse({
     description: 'Listado paginado de traslados',
     schema: {
