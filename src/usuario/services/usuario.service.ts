@@ -230,6 +230,8 @@ export class UsuarioService {
           'estado',
           'telefono',
           'direccion',
+          'cedula',
+
           'createdAt',
           'updatedAt',
         ],
@@ -249,7 +251,7 @@ export class UsuarioService {
           'estado',
           'telefono',
           'direccion',
-
+          'cedula',
           'createdAt',
           'updatedAt',
         ],
