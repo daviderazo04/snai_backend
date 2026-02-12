@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, ILike, Repository } from 'typeorm';
 import { Educa } from '../entities/educa.entity';
 import { Adolescente } from '../../adolescente/entities/adolescente.entity';
 import { EducaPayloadDto } from '../dto/educa.payload.dto';
@@ -60,10 +60,16 @@ export class EducaService {
     page: number = 1,
     size: number = 10,
     adolescenteId: number | undefined,
+    estudia: string | undefined,
+    nivel: string | undefined,
+    institucion: string | undefined,
   ): Promise<PaginatedResult<Educa>> {
     const skip = (page - 1) * size;
     const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
     if (adolescenteId != undefined) where.adolescente = { id: adolescenteId };
+    if (estudia != undefined) where.estudia = estudia;
+    if (nivel != undefined) where.nivel = ILike(`%${nivel}%`);
+    if (institucion != undefined) where.institucion = ILike(`%${institucion}%`);
     const [data, total] = await this.educaRepository.findAndCount({
       where,
       take: size,

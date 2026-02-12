@@ -62,6 +62,9 @@ export class EducaController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
   @ApiQuery({ name: 'adolescenteId', required: false, type: Number })
+  @ApiQuery({ name: 'estudia', required: false, type: String })
+  @ApiQuery({ name: 'nivel', required: false, type: String })
+  @ApiQuery({ name: 'institucion', required: false, type: String })
   @ApiOkResponse({
     description: 'Listado paginado de educación',
     schema: {
@@ -82,8 +85,18 @@ export class EducaController {
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
     @Query('adolescenteId') adolescenteId?: number,
+    @Query('estudia') estudia?: string,
+    @Query('nivel') nivel?: string,
+    @Query('institucion') institucion?: string,
   ): Promise<PaginatedResult<Educa>> {
-    return this.educaService.getEducaPaginado(page, size, adolescenteId);
+    return this.educaService.getEducaPaginado(
+      page,
+      size,
+      adolescenteId,
+      estudia,
+      nivel,
+      institucion,
+    );
   }
 
   @Patch('/:id')
