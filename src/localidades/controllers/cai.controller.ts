@@ -76,6 +76,8 @@ export class CaiController {
     description: 'Devuelve CAIs de forma paginada',
   })
   @ApiQuery({ name: 'nombre', required: false, type: String })
+  @ApiQuery({ name: 'provinciaId', required: false, type: Number })
+  @ApiQuery({ name: 'cantonId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
   @ApiOkResponse({
@@ -96,10 +98,19 @@ export class CaiController {
   })
   async getCais(
     @Query('nombre') nombre: string = '',
-    @Query('page') page: number = 1,
+    @Query('provinciaId') provinciaId?: number,
+    @Query('cantonId') cantonId?: number,
+    @Query('page')
+    page: number = 1,
     @Query('size') size: number = 10,
   ) {
-    return await this.caiService.getPaginatedCais(nombre, page, size);
+    return await this.caiService.getPaginatedCais(
+      nombre,
+      page,
+      size,
+      provinciaId,
+      cantonId,
+    );
   }
 
   @Delete('/:id')

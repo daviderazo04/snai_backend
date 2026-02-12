@@ -11,6 +11,10 @@ import { Sesion } from '../src/usuario/entities/sesion.entity';
 import { Sexo } from '../src/common/enums/sexo.enums';
 import { CryptService } from '../src/common/crypt.service';
 import { ALL_ENDPOINTS } from '../src/common/constants/endpoints';
+import {
+  ADMIN_TICS_ENDPOINTS,
+  PARAMETROS_ENDPOINTS,
+} from '../src/common/constants/seed-permissions';
 
 type SeedDeps = {
   endpointRepo: Repository<Endpoint>;
@@ -53,27 +57,58 @@ async function ensureAdminPerfil(
   if (!perfil) {
     perfil = deps.perfilRepo.create({
       nombre: 'Administrador',
-      descripcion: 'Acceso total inicial (ajustable posteriormente)',
+      descripcion:
+        'Gestion de usuarios, perfiles y parametros con permisos completos',
     });
     perfil = await deps.perfilRepo.save(perfil);
 
     console.log('Perfil Administrador creado');
   }
 
+  const adminEndpointSet = new Set<string>(ADMIN_TICS_ENDPOINTS);
   const permisosExistentes =
-    perfil.permisos?.map((p) => p.endpoint.endpoint) ?? [];
+    perfil.permisos?.reduce((acc, permiso) => {
+      acc.set(permiso.endpoint.endpoint, permiso);
+      return acc;
+    }, new Map<string, Permiso>()) ?? new Map<string, Permiso>();
+
   for (const endpoint of endpoints) {
-    if (permisosExistentes.includes(endpoint.endpoint)) continue;
-    const permiso = deps.permisoRepo.create({
-      endpoint,
-      perfil,
-      VIEW: true,
-      EDIT: true,
-    });
+    if (!adminEndpointSet.has(endpoint.endpoint)) continue;
+    const permisoExistente = permisosExistentes.get(endpoint.endpoint);
+    if (!permisoExistente) {
+      const permiso = deps.permisoRepo.create({
+        endpoint,
+        perfil,
+        VIEW: true,
+        EDIT: true,
+      });
+      await deps.permisoRepo.save(permiso);
+
+      console.log(
+        `Permiso agregado para ${endpoint.endpoint} al perfil Administrador`,
+      );
+      continue;
+    }
+    if (!permisoExistente.VIEW || !permisoExistente.EDIT) {
+      permisoExistente.VIEW = true;
+      permisoExistente.EDIT = true;
+      await deps.permisoRepo.save(permisoExistente);
+
+      console.log(
+        `Permiso actualizado para ${endpoint.endpoint} al perfil Administrador`,
+      );
+    }
+  }
+
+  for (const permiso of perfil.permisos ?? []) {
+    if (adminEndpointSet.has(permiso.endpoint.endpoint)) continue;
+    if (!permiso.VIEW && !permiso.EDIT) continue;
+    permiso.VIEW = false;
+    permiso.EDIT = false;
     await deps.permisoRepo.save(permiso);
 
     console.log(
-      `Permiso agregado para ${endpoint.endpoint} al perfil Administrador`,
+      `Permiso restringido para ${permiso.endpoint.endpoint} en perfil Administrador`,
     );
   }
 
@@ -91,8 +126,8 @@ async function ensureAdminUsuario(
   const cedula = process.env.SEED_ADMIN_CEDULA ?? '1717171717';
   const correo = process.env.SEED_ADMIN_EMAIL ?? 'admin@snai.local';
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!';
-  const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Admin';
-  const apellido = process.env.SEED_ADMIN_APELLIDO ?? 'SNIA';
+  const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Administrador';
+  const apellido = process.env.SEED_ADMIN_APELLIDO ?? 'Tics';
   const columnsRows = await deps.dataSource.query(
     `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'usuario'`,
   );
@@ -240,19 +275,14 @@ async function ensureParametrosPerfil(
     console.log('Perfil Parámetros creado');
   }
 
-  const endpointsParametros = [
-    '/parentesco',
-    '/etnia',
-    '/nacionalidad',
-    '/estado-civil',
-    '/gdos',
-  ];
+  const endpointsParametros = PARAMETROS_ENDPOINTS;
+  const endpointsParametrosSet = new Set<string>(endpointsParametros);
 
   const permisosExistentes =
     perfil.permisos?.map((p) => p.endpoint.endpoint) ?? [];
 
   for (const endpoint of endpoints) {
-    if (!endpointsParametros.includes(endpoint.endpoint)) continue;
+    if (!endpointsParametrosSet.has(endpoint.endpoint)) continue;
     if (permisosExistentes.includes(endpoint.endpoint)) continue;
 
     const permiso = deps.permisoRepo.create({

@@ -10,6 +10,7 @@ import { ALL_ENDPOINTS } from '../../common/constants/endpoints';
 import { CryptService } from '../../common/crypt.service';
 import { ConfigService } from '@nestjs/config';
 import { Sexo } from '../../common/enums/sexo.enums';
+import { ADMIN_TICS_ENDPOINTS } from '../../common/constants/seed-permissions';
 
 @Injectable()
 export class StartupSeedService implements OnApplicationBootstrap {
@@ -80,11 +81,13 @@ export class StartupSeedService implements OnApplicationBootstrap {
     if (!perfil) {
       perfil = this.perfilRepo.create({
         nombre: 'Administrador',
-        descripcion: 'Acceso total inicial (bootstrap)',
+        descripcion:
+          'Gestion de usuarios, perfiles y parametros con permisos completos',
       });
       perfil = await this.perfilRepo.save(perfil);
     }
 
+    const adminEndpointSet = new Set<string>(ADMIN_TICS_ENDPOINTS);
     const permisosExistentes =
       perfil.permisos?.reduce((acc, permiso) => {
         acc.set(permiso.endpoint.endpoint, permiso);
@@ -92,6 +95,7 @@ export class StartupSeedService implements OnApplicationBootstrap {
       }, new Map<string, Permiso>()) ?? new Map<string, Permiso>();
 
     for (const endpoint of endpoints) {
+      if (!adminEndpointSet.has(endpoint.endpoint)) continue;
       const permiso = permisosExistentes.get(endpoint.endpoint);
       if (!permiso) {
         await this.permisoRepo.save(
@@ -105,12 +109,20 @@ export class StartupSeedService implements OnApplicationBootstrap {
         continue;
       }
 
-      // Asegura permisos totales para el admin sin modificar otros campos
+      // Asegura permisos completos para los endpoints asignados
       if (!permiso.VIEW || !permiso.EDIT) {
         permiso.VIEW = true;
         permiso.EDIT = true;
         await this.permisoRepo.save(permiso);
       }
+    }
+
+    for (const permiso of perfil.permisos ?? []) {
+      if (adminEndpointSet.has(permiso.endpoint.endpoint)) continue;
+      if (!permiso.VIEW && !permiso.EDIT) continue;
+      permiso.VIEW = false;
+      permiso.EDIT = false;
+      await this.permisoRepo.save(permiso);
     }
 
     return perfil;
@@ -124,9 +136,9 @@ export class StartupSeedService implements OnApplicationBootstrap {
     const password =
       this.configService.get<string>('SEED_ADMIN_PASSWORD') ?? 'Admin123!';
     const nombre =
-      this.configService.get<string>('SEED_ADMIN_NOMBRE') ?? 'Admin';
+      this.configService.get<string>('SEED_ADMIN_NOMBRE') ?? 'Administrador';
     const apellido =
-      this.configService.get<string>('SEED_ADMIN_APELLIDO') ?? 'SNIA';
+      this.configService.get<string>('SEED_ADMIN_APELLIDO') ?? 'Tics';
 
     let usuario = await this.usuarioRepo.findOne({
       where: [{ correo }, { cedula }],

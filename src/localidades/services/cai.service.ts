@@ -24,29 +24,34 @@ export class CaiService {
     nombre: string = '',
     page: number = 1,
     size: number = 10,
+    cantondId: number | undefined,
+    provinciaId: number | undefined,
   ): Promise<PaginatedResult<Cai>> {
-    //Se envia canton
-    //
     const skip = (page - 1) * size;
-    if (nombre == '') {
-      const [cais, totales] = await this.caiRepository.findAndCount({
-        take: size,
-        skip: skip,
-        where: { estado: Equal(Estado.ACTIVO) },
-        relations: ['canton', 'canton.provincia'],
-      });
-      const totalPages = Math.ceil(totales / size);
-      return new PaginatedResult(cais, totalPages, page, size);
-    } else {
-      const [cais, totales] = await this.caiRepository.findAndCount({
-        where: { nombre: ILike(`%${nombre}%`), estado: Equal(Estado.ACTIVO) },
-        take: size,
-        skip: skip,
-        relations: ['canton', 'canton.provincia'],
-      });
-      const totalPages = Math.ceil(totales / size);
-      return new PaginatedResult(cais, totalPages, page, size);
+    const where: Record<string, any> = { estado: Equal(Estado.ACTIVO) };
+
+    if (nombre?.trim()) where.nombre = ILike(`%${nombre.trim()}%`);
+
+    if (cantondId != null) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      where.canton = { ...(where.canton ?? {}), id: cantondId };
     }
+
+    if (provinciaId != null) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      where.canton = {
+        ...(where.canton ?? {}),
+        provincia: { id: provinciaId },
+      };
+    }
+    const [cais, totales] = await this.caiRepository.findAndCount({
+      where,
+      take: size,
+      skip: skip,
+      relations: ['canton', 'canton.provincia'],
+    });
+    const totalPages = Math.ceil(totales / size);
+    return new PaginatedResult(cais, totalPages, page, size);
   }
   async createCai(payload: CaiPayloadDto): Promise<ResultWithData<Cai>> {
     try {
