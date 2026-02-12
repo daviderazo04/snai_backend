@@ -86,7 +86,7 @@ export class SaludController {
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
     @Query('adolescenteId') adolescenteId?: number,
-    @Query('diagnostico ') diagnostico?: string,
+    @Query('diagnostico') diagnostico?: string,
     @Query('discapacidad') discapacidad?: string,
   ): Promise<PaginatedResult<Salud>> {
     return this.saludService.getSaludPaginado(
