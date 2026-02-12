@@ -63,7 +63,7 @@ export class EducaService {
   ): Promise<PaginatedResult<Educa>> {
     const skip = (page - 1) * size;
     const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
-    if (adolescenteId != undefined) where.adolecente = { id: adolescenteId };
+    if (adolescenteId != undefined) where.adolescente = { id: adolescenteId };
     const [data, total] = await this.educaRepository.findAndCount({
       where,
       take: size,
