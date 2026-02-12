@@ -127,8 +127,34 @@ export class UsuarioService {
     userId: number,
     payload: UpdateUsuarioPasswordDto,
   ): Promise<ResultWithData<Usuario | null>> {
-    // TODO: implementar lógica de actualización de contraseña
-    return null as unknown as ResultWithData<Usuario | null>;
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      return new ResultWithData<null>(false, 'No existe ese usuario', null);
+    }
+
+    user.password = await this.cryptService.crypt(payload.password);
+    await this.userRepository.save(user);
+    const usuarioActualizado = await this.userRepository.findOne({
+      where: { id: userId },
+      select: [
+        'id',
+        'apellido',
+        'estado',
+        'nombre',
+        'correo',
+        'telefono',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+
+    return new ResultWithData<Usuario | null>(
+      true,
+      'Usuario actualizado correctamente',
+      usuarioActualizado,
+    );
   }
   async verificarUsuarioActivo(userId: number): Promise<boolean> {
     const user = await this.userRepository.findOneBy({
