@@ -25,10 +25,18 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
   },
   // Usuario y perfiles
   { endpoint: '/usuario', descripcion: 'Listado y gestion de usuarios' },
-  { endpoint: '/usuario/perfil', descripcion: 'Asignacion de perfiles a usuarios' },
+  {
+    endpoint: '/usuario/perfil',
+    descripcion: 'Asignacion de perfiles a usuarios',
+  },
+
   {
     endpoint: '/usuario/detalle',
     descripcion: 'Detalle de un usuario con sus perfiles y permisos',
+  },
+  {
+    endpoint: '/usuario/reactivar',
+    descripcion: 'Capacidad de reactivar usuarios',
   },
   {
     endpoint: '/endpoints',
@@ -39,6 +47,7 @@ export const ALL_ENDPOINTS: readonly EndpointDefinition[] = [
     endpoint: '/perfil/detalle',
     descripcion: 'Consulta de permisos aplanados de un perfil',
   },
+
   // Localidades
   { endpoint: '/provincias', descripcion: 'Catalogo de provincias' },
   { endpoint: '/cantones', descripcion: 'Catalogo de cantones' },

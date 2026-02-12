@@ -10,6 +10,7 @@ export const ADMIN_TICS_ENDPOINTS = [
   '/usuario',
   '/usuario/perfil',
   '/usuario/detalle',
+  '/usuario/reactivar',
   '/endpoints',
   '/perfil',
   '/perfil/detalle',
