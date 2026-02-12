@@ -136,9 +136,9 @@ export class StartupSeedService implements OnApplicationBootstrap {
     const password =
       this.configService.get<string>('SEED_ADMIN_PASSWORD') ?? 'Admin123!';
     const nombre =
-      this.configService.get<string>('SEED_ADMIN_NOMBRE') ?? 'Administrador';
+      this.configService.get<string>('SEED_ADMIN_NOMBRE') ?? 'Administrador Tics';
     const apellido =
-      this.configService.get<string>('SEED_ADMIN_APELLIDO') ?? 'Tics';
+      this.configService.get<string>('SEED_ADMIN_APELLIDO') ?? 'SNIA';
 
     let usuario = await this.usuarioRepo.findOne({
       where: [{ correo }, { cedula }],

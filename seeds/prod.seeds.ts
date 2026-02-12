@@ -126,8 +126,8 @@ async function ensureAdminUsuario(
   const cedula = process.env.SEED_ADMIN_CEDULA ?? '1717171717';
   const correo = process.env.SEED_ADMIN_EMAIL ?? 'admin@snai.local';
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'Admin123!';
-  const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Administrador';
-  const apellido = process.env.SEED_ADMIN_APELLIDO ?? 'Tics';
+  const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Administrador Tics';
+  const apellido = process.env.SEED_ADMIN_APELLIDO ?? 'SNIA';
   const columnsRows = await deps.dataSource.query(
     `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'usuario'`,
   );
