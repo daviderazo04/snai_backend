@@ -64,6 +64,8 @@ export class SaludController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
   @ApiQuery({ name: 'adolescenteId', required: false, type: Number })
+  @ApiQuery({ name: 'diagnostico', required: false, type: String })
+  @ApiQuery({ name: 'discapacidad', required: false, type: String })
   @ApiOkResponse({
     description: 'Listado paginado de registros de salud',
     schema: {
@@ -84,8 +86,16 @@ export class SaludController {
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
     @Query('adolescenteId') adolescenteId?: number,
+    @Query('diagnostico ') diagnostico?: string,
+    @Query('discapacidad') discapacidad?: string,
   ): Promise<PaginatedResult<Salud>> {
-    return this.saludService.getSaludPaginado(page, size, adolescenteId);
+    return this.saludService.getSaludPaginado(
+      page,
+      size,
+      adolescenteId,
+      diagnostico,
+      discapacidad,
+    );
   }
 
   @Patch('/:id')

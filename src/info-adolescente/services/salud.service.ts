@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, MoreThanOrEqual, Repository } from 'typeorm';
+import { Equal, ILike, MoreThanOrEqual, Repository } from 'typeorm';
 import { Salud } from '../entities/salud.entity';
 import { Adolescente } from '../../adolescente/entities/adolescente.entity';
 import { SaludPayloadDto } from '../dto/salud.payload.dto';
@@ -58,10 +58,14 @@ export class SaludService {
     page: number = 1,
     size: number = 10,
     adolescenteId: number | undefined,
+    diagnostico: string | undefined,
+    discapacidad: string | undefined,
   ): Promise<PaginatedResult<Salud>> {
     const skip = (page - 1) * size;
     const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
     if (adolescenteId != undefined) where.adolescente = { id: adolescenteId };
+    if (diagnostico != undefined) where.diagnostico = ILike(`%${diagnostico}%`);
+    if (discapacidad != undefined) where.discapacidad = discapacidad;
     const [data, total] = await this.saludRepository.findAndCount({
       where,
       take: size,
