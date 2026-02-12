@@ -32,17 +32,14 @@ export class CaiService {
 
     if (nombre?.trim()) where.nombre = ILike(`%${nombre.trim()}%`);
 
-    if (cantondId != null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      where.canton = { ...(where.canton ?? {}), id: cantondId };
+    if (cantondId != undefined) {
+      where.canton = { id: cantondId };
     }
 
-    if (provinciaId != null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      where.canton = {
-        ...(where.canton ?? {}),
-        provincia: { id: provinciaId },
-      };
+    if (provinciaId != undefined) {
+      if (where.canton == undefined) where.canton = {};
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      where.canton.provincia = { id: provinciaId };
     }
     const [cais, totales] = await this.caiRepository.findAndCount({
       where,
