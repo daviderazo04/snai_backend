@@ -1,20 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
 import { RegisterPayloadDto } from '../../auth/dto/register.payload.dto';
 import { CryptService } from '../../common/crypt.service';
 import { PaginatedResult } from '../../common/dto/paginated.result.dto';
-import { ILike } from 'typeorm';
 import { PerfilDto } from '../../auth/dto/perfil.dto';
-import { Perfil } from '../entities/perfil.entity';
 import {
   PerfilFlatResponseDto,
-  PermisoFlatResponseDto,
   UsuarioWithPerfilFlatResponseDto,
 } from '../dto/permiso.flat.response.dto';
 import { ResultWithData } from '../../common/dto/result.dto';
 import { RolesService } from './roles.service';
+import { Estado } from '../../common/enums/estado.enum';
 
 @Injectable()
 export class UsuarioService {
@@ -43,7 +41,15 @@ export class UsuarioService {
       throw new BadRequestException(error);
     }
   }
-
+  async verificarUsuarioActivo(userId: number): Promise<boolean> {
+    const user = await this.userRepository.findOneBy({
+      id: userId,
+    });
+    if (!user) {
+      return false;
+    }
+    return user.estado == Estado.ACTIVO;
+  }
   async verficarPermiso(
     userId: number,
     endpoint: string,
@@ -135,6 +141,56 @@ export class UsuarioService {
 
       return new PaginatedResult(perfiles, totalPages, page, size);
     }
+  }
+  async restaurarUsuario(id: number): Promise<ResultWithData<Usuario | null>> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      return new ResultWithData<null>(false, 'Usuario no encontrado', null);
+    }
+    user.estado = Estado.ACTIVO;
+    await this.userRepository.save(user);
+    const sa_user = await this.userRepository.findOne({
+      where: { id: id },
+      select: [
+        'id',
+        'apellido',
+        'estado',
+        'nombre',
+        'correo',
+        'estado',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+    if (!sa_user) {
+      return new ResultWithData<null>(false, 'Usuario no encontrado', null);
+    }
+    return new ResultWithData<Usuario>(false, 'Usuario no encontrado', sa_user);
+  }
+  async softDelete(id: number): Promise<ResultWithData<Usuario | null>> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      return new ResultWithData<null>(false, 'Usuario no encontrado', null);
+    }
+    user.estado = Estado.INACTIVO;
+    await this.userRepository.save(user);
+    const sa_user = await this.userRepository.findOne({
+      where: { id: id },
+      select: [
+        'id',
+        'apellido',
+        'estado',
+        'nombre',
+        'correo',
+        'estado',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+    if (!sa_user) {
+      return new ResultWithData<null>(false, 'Usuario no encontrado', null);
+    }
+    return new ResultWithData<Usuario>(false, 'Usuario no encontrado', sa_user);
   }
   async getUsuarioById(id: number): Promise<Usuario | null> {
     return this.userRepository.findOne({ where: { id } });

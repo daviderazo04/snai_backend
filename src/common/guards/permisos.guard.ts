@@ -35,6 +35,9 @@ export class PermisosGuard implements CanActivate {
 
     if (!user) return false;
     if (!user.perfilActivo) return false;
+    if (!(await this.usuarioService.verificarUsuarioActivo(user.id))) {
+      return false;
+    }
     const rutaEstandar = this.normalizePath(context, req);
     const metodo = req.method;
     const permitido = await this.usuarioService.verficarPermiso(

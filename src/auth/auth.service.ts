@@ -7,10 +7,11 @@ import { Usuario } from '../usuario/entities/usuario.entity';
 import { LoginPayloadDto } from './dto/login.payload.dto';
 import { ResultWithData } from '../common/dto/result.dto';
 import { LoginResponseData } from './dto/login.response.data';
-import { JwtUser } from '../common/jwt/JWTUser';
 import * as JWTUser from '../common/jwt/JWTUser';
+import { JwtUser } from '../common/jwt/JWTUser';
 import { PerfilDto } from './dto/perfil.dto';
 import { RolesService } from '../usuario/services/roles.service';
+import { Estado } from '../common/enums/estado.enum';
 
 @Injectable()
 export class AuthService {
@@ -75,7 +76,13 @@ export class AuthService {
         null,
       );
     }
-
+    if (user.estado == Estado.INACTIVO) {
+      return new ResultWithData<LoginResponseData>(
+        false,
+        'Su usuario ha sido desactivado',
+        null,
+      );
+    }
     const access_token = this.generateToken(user);
     const permisos = await this.usuarioService.getPerfiles(user.id);
     return new ResultWithData<LoginResponseData>(

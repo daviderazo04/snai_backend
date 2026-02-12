@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -58,7 +60,54 @@ export class UsuarioController {
   ) {
     return await this.rolesService.asignarPerfil(id, payload);
   }
-
+  @Delete('/:id')
+  @ApiOperation({
+    summary: 'Desactivar usuario (soft delete)',
+    description:
+      'Marca al usuario como inactivo sin eliminarlo físicamente y devuelve el registro actualizado.',
+  })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+  @ApiExtraModels(ResultWithData, Usuario)
+  @ApiOkResponse({
+    description: 'Usuario desactivado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Usuario) },
+          },
+        },
+      ],
+    },
+  })
+  async softDelete(@Param('id') id: number) {
+    return await this.userService.softDelete(id);
+  }
+  @Patch('/reactivar/:id')
+  @ApiOperation({
+    summary: 'Reactivar usuario',
+    description:
+      'Marca al usuario como activo nuevamente y devuelve el registro actualizado.',
+  })
+  @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
+  @ApiExtraModels(ResultWithData, Usuario)
+  @ApiOkResponse({
+    description: 'Usuario reactivado correctamente',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ResultWithData) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(Usuario) },
+          },
+        },
+      ],
+    },
+  })
+  async resturar(@Param('id') id: number) {
+    return await this.userService.restaurarUsuario(id);
+  }
   @Get()
   @ApiOperation({
     summary: 'Listar usuarios paginados',
