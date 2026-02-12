@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, MoreThanOrEqual, Repository } from 'typeorm';
 import { Salud } from '../entities/salud.entity';
 import { Adolescente } from '../../adolescente/entities/adolescente.entity';
 import { SaludPayloadDto } from '../dto/salud.payload.dto';
@@ -50,21 +50,20 @@ export class SaludService {
         saved,
       );
     } catch (error) {
-      return new ResultWithData<Salud>(
-        false,
-        (error as Error).message,
-        null,
-      );
+      return new ResultWithData<Salud>(false, (error as Error).message, null);
     }
   }
 
   async getSaludPaginado(
     page: number = 1,
     size: number = 10,
+    adolescenteId: number | undefined,
   ): Promise<PaginatedResult<Salud>> {
     const skip = (page - 1) * size;
+    const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
+    if (adolescenteId != undefined) where.adolescente = { id: adolescenteId };
     const [data, total] = await this.saludRepository.findAndCount({
-      where: { estado: Equal(Estado.ACTIVO) },
+      where,
       take: size,
       skip,
       relations: ['adolescente'],
@@ -82,7 +81,11 @@ export class SaludService {
     try {
       const salud = await this.saludRepository.findOneBy({ id });
       if (!salud) {
-        return new ResultWithData<Salud>(false, 'No existe el registro de salud', null);
+        return new ResultWithData<Salud>(
+          false,
+          'No existe el registro de salud',
+          null,
+        );
       }
 
       const adolescente = await this.adolescenteRepository.findOneBy({
@@ -90,7 +93,11 @@ export class SaludService {
       });
 
       if (!adolescente) {
-        return new ResultWithData<Salud>(false, 'Adolescente no encontrado', null);
+        return new ResultWithData<Salud>(
+          false,
+          'Adolescente no encontrado',
+          null,
+        );
       }
 
       // Actualización de campos

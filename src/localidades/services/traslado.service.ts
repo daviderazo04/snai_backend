@@ -118,7 +118,7 @@ export class TrasladoService {
     const where: Record<string, unknown> = { estado: Equal(Estado.ACTIVO) };
     if (from) where.fecha = MoreThanOrEqual(from);
     if (to) where.fecha = MoreThanOrEqual(to);
-    if (adolescenteId != undefined) where.adolecente = { id: adolescenteId };
+    if (adolescenteId != undefined) where.adolescente = { id: adolescenteId };
     const [traslados, total] = await this.trasladoRepository.findAndCount({
       where,
       take: size,

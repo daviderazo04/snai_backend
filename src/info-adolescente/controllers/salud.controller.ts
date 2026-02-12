@@ -39,7 +39,9 @@ export class SaludController {
   constructor(private readonly saludService: SaludService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crear un nuevo registro de salud para un adolescente' })
+  @ApiOperation({
+    summary: 'Crear un nuevo registro de salud para un adolescente',
+  })
   @ApiBody({ type: SaludPayloadDto })
   @ApiCreatedResponse({
     description: 'Registro creado correctamente',
@@ -61,6 +63,7 @@ export class SaludController {
   @ApiOperation({ summary: 'Listar registros de salud paginados' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'size', required: false, type: Number })
+  @ApiQuery({ name: 'adolescenteId', required: false, type: Number })
   @ApiOkResponse({
     description: 'Listado paginado de registros de salud',
     schema: {
@@ -80,8 +83,9 @@ export class SaludController {
   async getSalud(
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
+    @Query('adolescenteId') adolescenteId?: number,
   ): Promise<PaginatedResult<Salud>> {
-    return this.saludService.getSaludPaginado(page, size);
+    return this.saludService.getSaludPaginado(page, size, adolescenteId);
   }
 
   @Patch('/:id')
